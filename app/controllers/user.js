@@ -7,6 +7,33 @@ var jwt = require('jsonwebtoken');
 var UserModel = require(config.modelsPath + '/user');
 var graph = require('fbgraph');
 
+// to be added when query param token is in url
+var verifyToken = function(req, res, next) {
+  if (typeof req.query.token != 'undefined') {
+    var decoded = jwt.verify(req.query.token, 'testkey');
+    if (decoded.expires > Date.now()) {
+      UserModel.where({hashedId: decoded.hashedId}).findOne(function(err, user){
+        if (user) {
+          req.user = user;
+          return next();
+        } else {
+          return res.status(404).send({
+            error: 'not found'
+          });    
+        }
+      });
+    } else {
+      return res.status(401).send({
+        error: 'token expired'
+      });  
+    }
+  } else {
+    return res.status(500).send({
+      error: 'invalid params'
+    });
+  }
+};
+
 exports.init = function(app) {
   app.get('/auth', function(req, res) {
     if (typeof req.query.fb_token != 'undefined') {
@@ -58,22 +85,9 @@ exports.init = function(app) {
     }
   });
 
-  app.get('/check', function(req, res) {
-    if (typeof req.query.token != 'undefined') {
-      var decoded = jwt.verify(req.query.token, 'testkey');
-      UserModel.where({hashedId: decoded.hashedId}).findOne(function(err, user){
-        if (user) {
-          res.send(user);          
-        } else {
-          res.status(404).send({
-            error: 'not found'
-          });    
-        }
-      });
-    } else {
-      res.status(500).send({
-        error: 'invalid params'
-      });
+  app.get('/check', verifyToken, function(req, res) {
+    if (req.user) {
+      res.send('valid user');
     }
   });
 }
