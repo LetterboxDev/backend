@@ -56,4 +56,4 @@ var server = http.createServer(app).listen(app.get('port'), function(){
 // socket.io configuration
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-var io = require('socket.io').listen(server);
+require(__dirname + '/app/sockets/socket').init(server);
