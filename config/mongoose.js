@@ -17,4 +17,4 @@ db.on('connected', function(){
   }); 
 });
 
-module.exports = _.extend({mongoose: mongoose}, db);
+module.exports = db;

@@ -1,6 +1,7 @@
 // User schema
 var db = require('../../config/mongoose'),
-		Schema = db.mongoose.Schema;
+		mongoose = require('mongoose'),
+		Schema = mongoose.Schema;
   
 var UserSchema = new Schema({
 	profileId: {type : String},
@@ -18,5 +19,5 @@ UserSchema.path('hashedId').validate(function (hashedId) {
   return hashedId !== null;
 }, 'hashedId must not be null');
 
-var model = db.mongoose.model('Users', UserSchema);
+var model = db.model('Users', UserSchema);
 module.exports = model;

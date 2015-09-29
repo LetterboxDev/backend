@@ -24,25 +24,26 @@ exports.init = function(app) {
           var hashedId = require('crypto').createHash('md5').update(profileId).digest('hex');
           var gender = fbResponse.gender;
 
-          var user = UserModel.findOne({profileId: profileId});
-          console.log(hashedId);
-          if (!user) {
-            user = new UserModel({
-              profileId: profileId,
+          UserModel.where({profileId: profileId}).findOne(function(err, user){
+            if (!user) {
+              user = new UserModel({
+                profileId: profileId,
+                hashedId: hashedId,
+                gender: gender,
+                accessToken: fb_token
+              });
+              user.save();
+            }
+
+            var unencryptedToken = {
               hashedId: hashedId,
-              gender: gender,
-              accessToken: fb_token
+              expires: Date.now() + 604800
+            };
+            var encryptedToken = jwt.sign(unencryptedToken, 'testkey');
+            res.status(200).send({
+              hashedId: hashedId,
+              access_token: encryptedToken
             });
-            user.save();
-          }
-          var unencryptedToken = {
-            hashedId: hashedId,
-            expires: Date.now() + 604800
-          };
-          var encryptedToken = jwt.sign(unencryptedToken, 'testkey');
-          res.status(200).send({
-            hashedId: hashedId,
-            access_token: encryptedToken
           });
         } else {
           res.status(401).send({
@@ -60,7 +61,15 @@ exports.init = function(app) {
   app.get('/check', function(req, res) {
     if (typeof req.query.token != 'undefined') {
       var decoded = jwt.verify(req.query.token, 'testkey');
-      res.send(decoded);
+      UserModel.where({hashedId: decoded.hashedId}).findOne(function(err, user){
+        if (user) {
+          res.send(user);          
+        } else {
+          res.status(404).send({
+            error: 'not found'
+          });    
+        }
+      });
     } else {
       res.status(500).send({
         error: 'invalid params'

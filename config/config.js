@@ -4,7 +4,7 @@ var modelsPath = rootPath + '/app/models';
 
 module.exports = {
   development: {
-    db: 'mongodb://localhost:27017/'
+    db: 'mongodb://localhost:27017/Letterbox'
   },
   production: {
     db: '<INSERT_DB_PATH_HERE>'
