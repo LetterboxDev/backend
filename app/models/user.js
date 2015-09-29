@@ -8,6 +8,7 @@ var UserSchema = new Schema({
 	hashedId: {type : String},
 	gender: {type : String},
 	accessToken: {type : String},
+	isRegistered: {type : Boolean, default : false},
 	createdAt  : {type : Date, default : Date.now}
 });
 

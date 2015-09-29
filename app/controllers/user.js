@@ -46,13 +46,15 @@ exports.init = function(app) {
       graph.setAccessToken(fb_token);
 
       graph.get('/me?fields=id,gender', function(err, fbResponse) {
-        if (!err) {
+        if (!err && fbResponse) {
           var profileId = fbResponse.id;
           var hashedId = require('crypto').createHash('md5').update(profileId).digest('hex');
           var gender = fbResponse.gender;
 
           UserModel.where({profileId: profileId}).findOne(function(err, user){
+            var status = 'returning';
             if (!user) {
+              status = 'new';
               user = new UserModel({
                 profileId: profileId,
                 hashedId: hashedId,
@@ -60,6 +62,8 @@ exports.init = function(app) {
                 accessToken: fb_token
               });
               user.save();
+            } else if (!user.isRegistered) {
+              status = 'new';
             }
 
             var unencryptedToken = {
@@ -68,6 +72,7 @@ exports.init = function(app) {
             };
             var encryptedToken = jwt.sign(unencryptedToken, 'testkey');
             res.status(200).send({
+              status: status,
               hashedId: hashedId,
               access_token: encryptedToken
             });
