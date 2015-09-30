@@ -31,8 +31,8 @@ Object.keys(db).forEach(function(modelName) {
   }
 });
 
-sequelize.sync({force: true}).then(function() {
-  logger.info('Database *DROPPED* and synced');
+sequelize.sync({force: false}).then(function() {
+  logger.info('Database synced');
 }).catch(function(err) {
   logger.error('An error occurred when attempting to sync to MySQL: ' + err);
 })
