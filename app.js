@@ -2,16 +2,16 @@
 // Module dependencies
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-var express = require('express'),
-    http = require('http'),
-    fs = require('fs'),
-    path = require('path'),
-    bodyParser = require('body-parser'),
-    methodOverride = require('method-override');
+var express = require('express');
+var http = require('http');
+var fs = require('fs');
+var path = require('path');
+var bodyParser = require('body-parser');
+var methodOverride = require('method-override');
 
 // Load app configuration
-var env = process.env.NODE_ENV || 'development',
-    config = require('./config/config')[env];
+var env = process.env.NODE_ENV || 'development';
+var config = require('./config/config')[env];
 
 var app = express();
 
@@ -34,13 +34,13 @@ var db = require(__dirname + '/config/mongoose');
 // Controllers
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-var controllersDir = __dirname + '/app/controllers',
-    files = fs.readdirSync(controllersDir);
+var controllersDir = __dirname + '/app/controllers';
+var files = fs.readdirSync(controllersDir);
 
 files.forEach(function (file) {
-    controller = require(controllersDir + '/' + file);
-    controller.init(app);
-    console.log("Added controller: " + file);
+  controller = require(controllersDir + '/' + file);
+  controller.init(app);
+  console.log("Added controller: " + file);
 });
 
 
