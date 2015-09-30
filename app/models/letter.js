@@ -3,10 +3,7 @@ module.exports = function(sequelize, DataTypes) {
   var Letter = sequelize.define('Letter', {
     sender: {
       type: DataTypes.STRING(32),
-      validate: {
-        notNull: true,
-        notEmpty: true
-      },
+      allowNull: false,
       references: {
         model: 'UserAccounts',
         key: 'hashedId'
@@ -14,10 +11,7 @@ module.exports = function(sequelize, DataTypes) {
     },
     recipient: {
       type: DataTypes.STRING(32),
-      validate: {
-        notNull: true,
-        notEmpty: true
-      },
+      allowNull: false,
       references: {
         model: 'UserAccounts',
         key: 'hashedId'
@@ -25,10 +19,7 @@ module.exports = function(sequelize, DataTypes) {
     },
     letter: {
       type: DataTypes.TEXT,
-      validate: {
-        notNull: true,
-        notEmpty: true
-      }
+      allowNull: false
     }
   }, {
     timestamps: true, // sets createdAt and updatedAt

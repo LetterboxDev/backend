@@ -3,10 +3,7 @@ module.exports = function(sequelize, DataTypes) {
   var Message = sequelize.define('BufferedMessage', {
     from: {
       type: DataTypes.STRING(32),
-      validate: {
-        notNull: true,
-        notEmpty: true,
-      },
+      allowNull: false,
       references: {
         model: 'UserAccounts',
         key: 'hashedId'
@@ -14,10 +11,7 @@ module.exports = function(sequelize, DataTypes) {
     },
     to: {
       type: DataTypes.STRING(32),
-      validate: {
-        notNull: true,
-        notEmpty: true,
-      },
+      allowNull: false,
       references: {
         model: 'UserAccounts',
         key: 'hashedId'
@@ -25,16 +19,11 @@ module.exports = function(sequelize, DataTypes) {
     },
     message: {
       type: DataTypes.TEXT,
-      validate: {
-        notNull: true,
-        notEmpty: true,
-      }
+      allowNull: false
     },
     sentTime: {
       type: DataTypes.INTEGER,
-      validate: {
-        notNull: true
-      }
+      allowNull: false
     }
   }, {
     associate: function(models) {

@@ -3,10 +3,7 @@ module.exports = function(sequelize, DataTypes) {
   var Room = sequelize.define('Room', {
     user1: {
       type: DataTypes.STRING(32),
-      validate: {
-        notNull: true,
-        notEmpty: true
-      },
+      allowNull: false,
       references: {
         model: 'UserAccounts',
         key: 'hashedId'
@@ -14,10 +11,7 @@ module.exports = function(sequelize, DataTypes) {
     },
     user2: {
       type: DataTypes.STRING(32),
-      validate: {
-        notNull: true,
-        notEmpty: true
-      },
+      allowNull: false,
       references: {
         model: 'UserAccounts',
         key: 'hashedId'

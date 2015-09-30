@@ -3,36 +3,25 @@ module.exports = function(sequelize, DataTypes) {
   var User = sequelize.define('UserAccount', {
     profileId: {
       type: DataTypes.STRING,
-      validate: {
-        notNull: true,
-        notEmpty: true
-      },
+      allowNull: false
     },
     hashedId: {
       type: DataTypes.STRING(32),
-      validate: {
-        notNull: true,
-        notEmpty: true
-      },
+      allowNull: false,
       primaryKey: true
     },
     gender: {
       type: DataTypes.STRING(6),
-      validate: {
-        notNull: true,
-        notEmpty: true
-      },
+      allowNull: false,
       isIn: [['male', 'female']]
     },
     accessToken: {
       type: DataTypes.STRING,
-      validate: {
-        notNull: true,
-        notEmpty: true
-      },
+      allowNull: false
     },
     isRegistered: {
       type: DataTypes.BOOLEAN,
+      allowNull: false,
       defaultValue: false
     }
   }, {
