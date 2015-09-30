@@ -1,11 +1,11 @@
 // Module dependencies
-
 var express = require('express');
 var http = require('http');
 var fs = require('fs');
 var path = require('path');
 var bodyParser = require('body-parser');
 var methodOverride = require('method-override');
+var logger = require('./config/logger');
 
 // Load app configuration
 var env = process.env.NODE_ENV || 'development';
@@ -19,8 +19,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(methodOverride());
 
-// Models
-var db = require(__dirname + '/config/mongoose');
+// Set up sequelize orm
+var db = require(__dirname + '/config/sequelize');
 
 // Routes
 var routesDir = __dirname + '/app/routes';
@@ -29,12 +29,12 @@ var files = fs.readdirSync(routesDir);
 files.forEach(function (file) {
   route = require(routesDir + '/' + file);
   route.init(app);
-  console.log("Added route: " + file);
+  logger.info("Added route: " + file);
 });
 
 // Server
 var server = http.createServer(app).listen(app.get('port'), function(){
-  console.log("Letterbox backend listening on port " + app.get('port'));
+  logger.info("Letterbox backend listening on port " + app.get('port'));
 });
 
 // socket.io configuration

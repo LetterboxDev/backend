@@ -4,7 +4,7 @@
 
 var config = require('../../config/config');
 var tokenController = require('./token');
-var UserModel = require(config.modelsPath + '/user');
+var db = require('../../config/sequelize');
 var graph = require('fbgraph');
 
 exports.authenticate = function(req, res) {
@@ -23,17 +23,16 @@ exports.authenticate = function(req, res) {
         var hashedId = require('crypto').createHash('md5').update(profileId).digest('hex');
         var gender = fbResponse.gender;
 
-        UserModel.where({profileId: profileId}).findOne(function(err, user){
+        db.UserAccount.findOne({where: {hashedId: hashedId}}).then(function(user) {
           var status = 'returning';
           if (!user) {
             status = 'new';
-            user = new UserModel({
+            db.UserAccount.create({
               profileId: profileId,
               hashedId: hashedId,
               gender: gender,
               accessToken: fb_token
-            });
-            user.save();
+            })
           } else if (!user.isRegistered) {
             status = 'new';
           }

@@ -4,10 +4,22 @@ var modelsPath = rootPath + '/app/models';
 
 module.exports = {
   development: {
-    db: 'mongodb://localhost:27017/Letterbox'
+    db: {
+      name: "letterbox",
+      username: "root",
+      password: "admin",
+      host: "localhost",
+      port: 3306
+    }
   },
   production: {
-    db: '<INSERT_DB_PATH_HERE>'
+    db: {
+      name: "letterbox",
+      username: "root",
+      password: "admin",
+      host: "localhost",
+      port: 3306
+    }
   },
   rootPath: rootPath,
   modelsPath: modelsPath
