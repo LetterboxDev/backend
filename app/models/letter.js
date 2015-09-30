@@ -28,7 +28,7 @@ module.exports = function(sequelize, DataTypes) {
       validate: {
         notNull: true,
         notEmpty: true
-      },
+      }
     }
   }, {
     timestamps: true, // sets createdAt and updatedAt
