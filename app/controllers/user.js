@@ -81,3 +81,20 @@ exports.getQuestion = function(req, res) {
   });
 };
 
+exports.postQuestion = function(req, res) {
+  var question = req.body.question;
+  var owner;
+
+  // Create a new profile question associated with the owner
+  db.UserAccount.findOne({
+    where: {
+      hashedId: req.query.token
+    }
+  }).then(function(user) {
+    db.ProfileQuestion.create({
+      owner: user,
+      question: question
+    });
+  });
+};
+
