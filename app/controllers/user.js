@@ -62,3 +62,22 @@ exports.check = function(req, res) {
     res.send('valid user');
   }
 }
+
+exports.getQuestion = function(req, res) {
+  db.ProfileQuestion.findOne({
+    order: [
+      ['updatedAt', 'DESC']
+    ]
+  }).then(function(question) {
+    if (question == null) {
+      res.status(400).send({
+        status: 'Cannot find active profile question'
+      });
+    } else {
+      res.status(200).send({
+        question: question.question
+      });
+    }
+  });
+};
+
