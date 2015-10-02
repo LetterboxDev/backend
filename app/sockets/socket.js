@@ -1,4 +1,3 @@
-var socketJwt = require('socketio-jwt');
 var socketIo = require('socket.io');
 
 exports.init = function(server) {
