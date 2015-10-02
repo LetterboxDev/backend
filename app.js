@@ -16,10 +16,14 @@ var app = express();
 
 // Express configuration
 app.set('port', process.env.PORT || 8080);
+app.set('views', './app/views');
+app.set('view engine', 'jade');
+app.disable('view cache');
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(methodOverride());
+
 
 // Set up sequelize orm
 var db = require(__dirname + '/config/sequelize');
