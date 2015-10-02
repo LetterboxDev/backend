@@ -22,6 +22,9 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: false
     }
   }, {
+    associate: function(models) {
+      Letter.belongsTo(models.ProfileQuestion);
+    },
     timestamps: true, // sets createdAt and updatedAt
     paranoid: false, // disables soft deletion
   });
