@@ -3,7 +3,7 @@
  */
 
 var config = require('../../config/config');
-var tokenController = require('./token');
+var token = require('../../config/token');
 var db = require('../../config/sequelize');
 var graph = require('fbgraph');
 
@@ -80,7 +80,7 @@ exports.storeUserData = function(req, res, next) {
         accessToken: req.fb_token
       })
     }
-    var encryptedToken = tokenController.generateToken(hashedId);
+    var encryptedToken = token.generateToken(hashedId);
     res.cookie('letterbox_token', encryptedToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production'
