@@ -1,13 +1,14 @@
 var db = require('./sequelize');
 var jwt = require('jsonwebtoken');
+var token = require('./token');
 
 exports.extractUser = function(app) {
   app.use(function(req, res, next) {
-    var token = req.cookies.letterbox_token;
+    var letterboxToken = req.cookies.letterbox_token;
     req.user = {};
     req.authentication = {isAuthenticated: false};
-    if (token) {
-      var decoded = jwt.verify(token, 'testkey');
+    if (letterboxToken) {
+      var decoded = token.decryptToken(letterboxToken);
       if (decoded.expires > Date.now()) {
         db.UserAccount.findOne({
           where: {
