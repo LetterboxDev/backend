@@ -6,6 +6,7 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var methodOverride = require('method-override');
+var morgan = require('morgan');
 var logger = require('./config/logger');
 
 // Load app configuration
@@ -13,6 +14,9 @@ var env = process.env.NODE_ENV || 'development';
 var config = require('./config/config')[env];
 
 var app = express();
+
+// Set up logging
+app.use(morgan('dev', {'stream': logger.stream}));
 
 // Express configuration
 app.set('port', process.env.PORT || 8080);
