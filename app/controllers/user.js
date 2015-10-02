@@ -108,11 +108,14 @@ exports.logout = function(req, res) {
 
 exports.getQuestion = function(req, res) {
   db.ProfileQuestion.findOne({
+    where: {
+      owner: req.user.hashedId
+    },
     order: [
       ['updatedAt', 'DESC']
     ]
   }).then(function(question) {
-    if (question == null) {
+    if (!question) {
       res.status(400).send({
         status: 'Cannot find active profile question'
       });
@@ -129,15 +132,11 @@ exports.postQuestion = function(req, res) {
   var owner;
 
   // Create a new profile question associated with the owner
-  db.UserAccount.findOne({
-    where: {
-      hashedId: req.query.token
-    }
-  }).then(function(user) {
-    db.ProfileQuestion.create({
-      owner: user,
-      question: question
-    });
+  db.ProfileQuestion.create({
+    owner: req.user.hashedId,
+    question: question
+  }).then(function(question) {
+    return res.send(question);
   });
 };
 
