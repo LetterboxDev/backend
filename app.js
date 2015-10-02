@@ -24,6 +24,9 @@ app.use(methodOverride());
 // Set up sequelize orm
 var db = require(__dirname + '/config/sequelize');
 
+// Set up cookie authentication
+require(__dirname + '/config/cookies').extractUser(app);
+
 // Routes
 var routesDir = __dirname + '/app/routes';
 var files = fs.readdirSync(routesDir);
