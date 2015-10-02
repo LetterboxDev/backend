@@ -20,16 +20,18 @@ exports.extractUser = function(app) {
             req.user = user;
           } else {
             req.authentication.message = 'no user found';
+            res.clearCookie('letterbox_token');
           }
-          next();
+          return next();
         })
       } else {
         req.authentication.message = 'token expired';
-        next();
+        res.clearCookie('letterbox_token');
+        return next();
       }
     } else {
       req.authentication.message = 'no token found in cookies';
-      next();
+      return next();
     }
   });
 }
