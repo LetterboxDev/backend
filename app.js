@@ -3,6 +3,7 @@ var express = require('express');
 var http = require('http');
 var fs = require('fs');
 var path = require('path');
+var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var methodOverride = require('method-override');
 var logger = require('./config/logger');
@@ -15,6 +16,7 @@ var app = express();
 
 // Express configuration
 app.set('port', process.env.PORT || 8080);
+app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(methodOverride());
