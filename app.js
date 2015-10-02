@@ -3,6 +3,7 @@ var express = require('express');
 var http = require('http');
 var fs = require('fs');
 var path = require('path');
+var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var methodOverride = require('method-override');
 var logger = require('./config/logger');
@@ -15,12 +16,16 @@ var app = express();
 
 // Express configuration
 app.set('port', process.env.PORT || 8080);
+app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(methodOverride());
 
 // Set up sequelize orm
 var db = require(__dirname + '/config/sequelize');
+
+// Set up cookie authentication
+require(__dirname + '/config/cookies').extractUser(app);
 
 // Routes
 var routesDir = __dirname + '/app/routes';
