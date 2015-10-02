@@ -14,5 +14,5 @@ exports.generateToken = function(hashedId) {
 
 // decrypts the token provided with the key
 exports.decryptToken = function(encryptedToken) {
-  return jwt.verify(token, key);
+  return jwt.verify(encryptedToken, key);
 }
