@@ -28,7 +28,7 @@ exports.extractUser = function(app) {
         next();
       }
     } else {
-      req.authentication.message = 'no token provided';
+      req.authentication.message = 'no token found in cookies';
       next();
     }
   });
