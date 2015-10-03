@@ -7,9 +7,6 @@ var app = require('./config/express');
 // Set up sequelize orm
 var db = require(__dirname + '/config/sequelize');
 
-// Set up cookie authentication
-require(__dirname + '/config/cookies').extractUser(app);
-
 // Socket.io configuration
 var io = require('./config/socketio');
 
