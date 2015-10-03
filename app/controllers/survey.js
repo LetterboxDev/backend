@@ -28,6 +28,19 @@ exports.getOnboarding = function(req, res) {
   });
 };
 
+exports.postResponses = function(req, res) {
+  for (response in req.body.responses) {
+    for (choice in response.choices) {
+      db.SurveyUserAnswer.create({
+        user: req.user.hashedId,
+        SurveyQuestionId: response.questionId,
+        SurveyChoiceId: choice.choiceId
+      })
+    }
+  }
+  return res.status(200).send({status: 'responses posted'});
+};
+
 exports.getOnboardingResponses = function(req, res) {
   db.SurveyQuestion.findAll({
     where: {
