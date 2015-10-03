@@ -37,11 +37,39 @@ exports.postQuestion = function(req, res) {
   });
 };
 
+exports.postLetter = function(req, res) {
+  db.Letter.findAndCountAll({
+    sender: req.user.hashedId,
+    recipient: req.question.owner,
+    ProfileQuestionId: req.question.id
+  }).then(function(result) {
+    if (result.count === 0) {
+      db.Letter.create({
+        sender: req.user.hashedId,
+        recipient: req.question.owner,
+        letter: req.body.letter,
+        ProfileQuestionId: req.question.id
+      }).then(function(letter) {
+        return res.send({
+          status: 'success',
+          letter: letter
+        });
+      });
+    } else {
+      return res.status(400).send({
+        status: 'unable to post letter, letter already exists between users for this question'
+      });
+    }
+  })
+};
+
 exports.getOtherUserQuestion = function(req, res) {
   if (req.question.owner !== req.user.hashedId) {
     return res.send(req.question);
   } else {
-    return res.status(400).send('unable to access own question, use /question/self');
+    return res.status(400).send({
+      status: 'unable to access own question, use /question/self'
+    });
   }
 };
 
