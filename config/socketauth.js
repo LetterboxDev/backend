@@ -1,5 +1,5 @@
-var token = require('../../config/token');
-var db = require('../../config/sequelize');
+var token = require('./token');
+var db = require('./sequelize');
 
 exports.authenticate = function (socket, next) {
   var errorMessage = "";

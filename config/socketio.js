@@ -1,7 +1,7 @@
 var socketIo = require('socket.io');
 var cookieParser = require('socket.io-cookie');
-var db = require('../../config/sequelize');
-var auth = require('./auth');
+var db = require('./sequelize');
+var auth = require('./socketauth');
 
 exports.init = function(server) {
   var io = socketIo(server);
@@ -11,5 +11,5 @@ exports.init = function(server) {
   // Checks if the socket is from a valid user
   io.use(auth.authenticate);
 
-  
+  return io;
 };

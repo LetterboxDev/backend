@@ -28,12 +28,19 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(methodOverride());
 
-
 // Set up sequelize orm
 var db = require(__dirname + '/config/sequelize');
 
 // Set up cookie authentication
 require(__dirname + '/config/cookies').extractUser(app);
+
+// Server
+var server = http.createServer(app).listen(app.get('port'), function(){
+  logger.info("Letterbox backend listening on port " + app.get('port'));
+});
+
+// Socket.io configuration
+var io = require('./config/socketio').init(server);
 
 // Routes
 var routesDir = __dirname + '/app/routes';
@@ -44,11 +51,3 @@ files.forEach(function (file) {
   route.init(app);
   logger.info("Added route: " + file);
 });
-
-// Server
-var server = http.createServer(app).listen(app.get('port'), function(){
-  logger.info("Letterbox backend listening on port " + app.get('port'));
-});
-
-// socket.io configuration
-require(__dirname + '/app/sockets/socket').init(server);
