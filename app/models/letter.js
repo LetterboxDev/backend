@@ -20,6 +20,16 @@ module.exports = function(sequelize, DataTypes) {
     letter: {
       type: DataTypes.TEXT,
       allowNull: false
+    },
+    isRead: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false
+    },
+    isApproved: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false
     }
   }, {
     associate: function(models) {
