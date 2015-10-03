@@ -63,6 +63,27 @@ exports.postLetter = function(req, res) {
   })
 };
 
+exports.approveLetter = function(req, res) {
+  db.Letter.findAndCountAll({
+    sender: req.user.hashedId,
+    recipient: req.question.owner,
+    ProfileQuestionId: req.question.id
+  }).then(function(result) {
+    if (result.count === 0) {
+      return res.status(400).send({
+        status: 'Unable to find the current letter.'
+      });
+    }
+    result.rows[0].update({
+      isApproved: true
+    }).then(function(letter) {
+      return res.send({
+        status: 'Approved'
+      });
+    });
+  });
+};
+
 exports.getOtherUserQuestion = function(req, res) {
   if (req.question.owner !== req.user.hashedId) {
     return res.send(req.question);
@@ -100,3 +121,4 @@ exports.extractUserQuestion = function(req, res, next, hashedId) {
     }
   });
 };
+
