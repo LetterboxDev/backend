@@ -4,4 +4,5 @@ exports.init = function(app) {
   app.get('/user/auth', userController.checkFacebookTokenParam, userController.validateFacebookToken, userController.extendFacebookToken, userController.storeUserData);
   app.get('/user/check', userController.requireAuthentication, userController.check);
   app.get('/user/logout', userController.requireAuthentication, userController.logout);
+  app.get('/user/similarity/:otherUserHashedId', userController.requireAuthentication, userController.getSimilarityIndexWithOtherUser);
 }

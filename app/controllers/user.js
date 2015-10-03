@@ -107,3 +107,46 @@ exports.logout = function(req, res) {
     user: req.user
   });
 }
+
+exports.getSimilarityIndexWithOtherUser = function(req, res) {
+  if (req.user.hashedId === req.params.otherUserHashedId) {
+    return res.status(200).send({
+      similarity: '1.000'
+    });
+  }
+
+  db.SurveyUserAnswer.findAndCountAll({
+    attributes: ['user', 'SurveyChoiceId'],
+    where: {
+      user: {
+        in: [req.user.hashedId, req.params.otherUserHashedId]
+      }
+    },
+    order: 'user'
+  }).then(function(result) {
+    var numberOfAnswers = result.count;
+    if (result.count === 0) {
+      return res.status(200).send({
+        similarity: '0.000'
+      });
+    }
+
+    // storing first user's answers in a set for fast access and compare later
+    var firstUserAnswersSet = {};
+    var firstUserId = result.rows[0].user;
+    var numberOfSameRecord = 0;
+    result.rows.forEach(function(answer) {
+      if (answer.user === firstUserId) {
+        firstUserAnswersSet[answer.SurveyChoiceId] = 1;
+      } else {
+        if (typeof firstUserAnswersSet[answer.SurveyChoiceId] !== 'undefined') {
+          numberOfSameRecord ++;
+        }
+      }
+    });
+
+    return res.status(200).send({
+      similarity: (numberOfSameRecord / (numberOfAnswers - numberOfSameRecord)).toFixed(3)
+    });
+  });
+}
