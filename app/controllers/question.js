@@ -36,3 +36,39 @@ exports.postQuestion = function(req, res) {
     return res.send(question);
   });
 };
+
+exports.getOtherUserQuestion = function(req, res) {
+  if (req.question.owner !== req.user.hashedId) {
+    return res.send(req.question);
+  } else {
+    return res.status(400).send('unable to access own question, use /question/self');
+  }
+};
+
+exports.extractUserQuestion = function(req, res, next, hashedId) {
+  db.UserAccount.findOne({where: {hashedId: hashedId}}).then(function(user) {
+    if (user) {
+      db.ProfileQuestion.findOne({
+        where: {
+          owner: hashedId
+        },
+        order: [
+          ['updatedAt', 'DESC']
+        ]
+      }).then(function(question) {
+        if (!question) {
+          return res.status(400).send({
+            status: 'Cannot find active user profile question'
+          });
+        } else {
+          req.question = question;
+          return next();
+        }
+      });
+    } else {
+      return res.status(400).send({
+        status: 'User does not exist'
+      });
+    }
+  });
+};
