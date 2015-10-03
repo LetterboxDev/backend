@@ -1,15 +1,19 @@
+var http = require('http');
+var logger = require('./logger');
 var socketIo = require('socket.io');
 var cookieParser = require('socket.io-cookie');
-var db = require('./sequelize');
 var auth = require('./socketauth');
+var app = require('./express');
 
-exports.init = function(server) {
-  var io = socketIo(server);
+// Server
+var server = http.createServer(app).listen(app.get('port'), function(){
+  logger.info("Letterbox backend listening on port " + app.get('port'));
+});
+var io = socketIo(server);
 
-  // Parses the cookies from client
-  io.use(cookieParser);
-  // Checks if the socket is from a valid user
-  io.use(auth.authenticate);
+// Parses the cookies from client
+io.use(cookieParser);
+// Checks if the socket is from a valid user
+io.use(auth.authenticate);
 
-  return io;
-};
+module.exports = io;

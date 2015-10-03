@@ -1,32 +1,8 @@
 // Module dependencies
-var express = require('express');
-var http = require('http');
 var fs = require('fs');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var bodyParser = require('body-parser');
-var methodOverride = require('method-override');
-var morgan = require('morgan');
 var logger = require('./config/logger');
 
-// Load app configuration
-var env = process.env.NODE_ENV || 'development';
-var config = require('./config/config')[env];
-
-var app = express();
-
-// Set up logging
-app.use(morgan('dev', {'stream': logger.stream}));
-
-// Express configuration
-app.set('port', process.env.PORT || 8080);
-app.set('views', './app/views');
-app.set('view engine', 'jade');
-app.disable('view cache');
-app.use(cookieParser());
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
-app.use(methodOverride());
+var app = require('./config/express');
 
 // Set up sequelize orm
 var db = require(__dirname + '/config/sequelize');
@@ -34,13 +10,8 @@ var db = require(__dirname + '/config/sequelize');
 // Set up cookie authentication
 require(__dirname + '/config/cookies').extractUser(app);
 
-// Server
-var server = http.createServer(app).listen(app.get('port'), function(){
-  logger.info("Letterbox backend listening on port " + app.get('port'));
-});
-
 // Socket.io configuration
-var io = require('./config/socketio').init(server);
+var io = require('./config/socketio');
 
 // Routes
 var routesDir = __dirname + '/app/routes';
