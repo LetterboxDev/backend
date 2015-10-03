@@ -14,6 +14,9 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: false
     }
   }, {
+    associate: function(models) {
+      Question.hasMany(models.Letter);
+    },
     timestamps: true, // sets createdAt and updatedAt
     paranoid: false, // disables soft deletion
   });
