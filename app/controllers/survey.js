@@ -29,6 +29,13 @@ exports.getOnboarding = function(req, res) {
 };
 
 exports.postResponses = function(req, res) {
+  // remove all the previous response from the user
+  db.SurveyUserAnswer.destroy({
+    where: {
+      user: req.user.hashedId
+    }
+  });
+
   // for...in gets the key, not the value
   for (var i = 0; i < req.body.responses.length; i ++) {
     var response = req.body.responses[i];
