@@ -28,6 +28,7 @@ module.exports = function(sequelize, DataTypes) {
     },
     associate: function(models) {
       Question.hasMany(models.SurveyChoice);
+      Question.hasMany(models.SurveyUserAnswer);
     },
     timestamps: true, // sets createdAt and updatedAt
     paranoid: false, // disables soft deletion
