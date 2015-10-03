@@ -6,7 +6,7 @@ var key = 'testkey';
 exports.generateToken = function(hashedId) {
   var unencryptedToken = {
     hashedId: hashedId,
-    expires: Date.now() + 604800
+    expires: Date.now() + 604800000
   };
 
   return jwt.sign(unencryptedToken, key);
