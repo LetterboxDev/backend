@@ -15,4 +15,4 @@ exports.getRooms = function (req, res) {
   }).then(function(rooms) {
     res.status(200).send(rooms);
   });
-}
+};
