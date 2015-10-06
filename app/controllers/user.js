@@ -12,13 +12,13 @@ var graph = require('fbgraph');
  */
 exports.requireAuthentication = function(req, res, next) {
   if (req.authentication.isAuthenticated) {
-    next();
+    return next();
   } else {
     return res.status(400).send({
       error: req.authentication.message
     });
   }
-}
+};
 
 exports.checkFacebookTokenParam = function(req, res, next) {
   if (typeof req.query.fb_token !== 'undefined') {
@@ -29,7 +29,7 @@ exports.checkFacebookTokenParam = function(req, res, next) {
       error: 'invalid params, fb_token required'
     });
   }
-}
+};
 
 exports.validateFacebookToken = function(req, res, next) {
   graph.setAccessToken(req.fb_token);
@@ -44,7 +44,7 @@ exports.validateFacebookToken = function(req, res, next) {
       });
     }   
   });
-}
+};
 
 exports.extendFacebookToken = function(req, res, next) {
   graph.setAccessToken(req.fb_token);
@@ -61,7 +61,7 @@ exports.extendFacebookToken = function(req, res, next) {
       error: 'unable to extend token'
     });
   });
-}
+};
 
 exports.storeUserData = function(req, res, next) {
   var hashedId = require('crypto').createHash('md5').update(req.profileId).digest('hex');
@@ -91,14 +91,7 @@ exports.storeUserData = function(req, res, next) {
       status: 'success'
     });
   });
-}
-
-exports.check = function(req, res) {
-  return res.send({
-    status: 'valid user',
-    user: req.user
-  });
-}
+};
 
 exports.logout = function(req, res) {
   res.clearCookie('letterbox_token');
@@ -106,47 +99,51 @@ exports.logout = function(req, res) {
     status: 'successfully logged out',
     user: req.user
   });
-}
+};
 
-exports.getSimilarityIndexWithOtherUser = function(req, res) {
-  if (req.user.hashedId === req.params.otherUserHashedId) {
-    return res.status(200).send({
-      similarity: '1.000'
-    });
-  }
-
-  db.SurveyUserAnswer.findAndCountAll({
-    attributes: ['user', 'SurveyChoiceId'],
+exports.getUser = function(req, res, next, hashedId) {
+  db.UserAccount.findOne({
     where: {
-      user: {
-        in: [req.user.hashedId, req.params.otherUserHashedId]
-      }
+      hashedId: hashedId
     },
-    order: 'user'
-  }).then(function(result) {
-    var numberOfAnswers = result.count;
-    if (result.count === 0) {
-      return res.status(200).send({
-        similarity: '0.000'
+    include: [
+      {
+        model: db.UserWyrQuestion,
+        include: db.WyrQuestion
+      }
+    ]
+  }).then(function(user) {
+    if (user) {
+      req.otherUser = user.get({plain: true});
+      return next();
+    } else {
+      return res.status(404).send({
+        error: 'user not found'
       });
     }
-
-    // storing first user's answers in a set for fast access and compare later
-    var firstUserAnswersSet = {};
-    var firstUserId = result.rows[0].user;
-    var numberOfSameRecord = 0;
-    result.rows.forEach(function(answer) {
-      if (answer.user === firstUserId) {
-        firstUserAnswersSet[answer.SurveyChoiceId] = 1;
-      } else {
-        if (typeof firstUserAnswersSet[answer.SurveyChoiceId] !== 'undefined') {
-          numberOfSameRecord ++;
-        }
-      }
-    });
-
-    return res.status(200).send({
-      similarity: (numberOfSameRecord / (numberOfAnswers - numberOfSameRecord)).toFixed(3)
-    });
   });
-}
+};
+
+exports.getSelf = function(req, res) {
+  var questions = [];
+  for (var i = 0; i < req.user.UserWyrQuestions.length; i++) {
+    questions.push(req.user.UserWyrQuestions[i].WyrQuestion);
+  }
+  return res.send({
+    hashedId: req.user.hashedId,
+    gender: req.user.gender,
+    questions: questions
+  });
+};
+
+exports.getOtherUser = function(req, res) {
+  var questions = [];
+  for (var i = 0; i < req.otherUser.UserWyrQuestions.length; i++) {
+    questions.push(req.otherUser.UserWyrQuestions[i].WyrQuestion);
+  }
+  return res.send({
+    hashedId: req.otherUser.hashedId,
+    gender: req.otherUser.gender,
+    questions: questions
+  });
+};

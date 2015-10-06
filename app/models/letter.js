@@ -17,11 +17,27 @@ module.exports = function(sequelize, DataTypes) {
         key: 'hashedId'
       }
     },
-    letter: {
-      type: DataTypes.TEXT,
+    selection0: {
+      type: DataTypes.BOOLEAN,
       allowNull: false
     },
-    isRead: {
+    selection1: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false
+    },
+    selection2: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false
+    },
+    selection3: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false
+    },
+    selection4: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false
+    },
+    isSent: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
       defaultValue: false
@@ -32,9 +48,6 @@ module.exports = function(sequelize, DataTypes) {
       defaultValue: false
     }
   }, {
-    associate: function(models) {
-      Letter.belongsTo(models.ProfileQuestion);
-    },
     timestamps: true, // sets createdAt and updatedAt
     paranoid: false, // disables soft deletion
   });

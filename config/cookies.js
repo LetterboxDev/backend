@@ -13,7 +13,13 @@ exports.cookieAuth = function(req, res, next) {
       db.UserAccount.findOne({
         where: {
           hashedId: decoded.hashedId
-        }
+        },
+        include: [
+          {
+            model: db.UserWyrQuestion,
+            include: db.WyrQuestion
+          }
+        ]
       }).then(function(user) {
         if (user) {
           req.authentication.isAuthenticated = true;
