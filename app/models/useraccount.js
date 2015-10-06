@@ -25,6 +25,9 @@ module.exports = function(sequelize, DataTypes) {
       defaultValue: false
     }
   }, {
+    associate: function(models) {
+      User.hasMany(models.UserWyrQuestion);
+    },
     timestamps: true, // sets createdAt and updatedAt
     paranoid: false, // disables soft deletion
   });
