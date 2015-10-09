@@ -10,6 +10,18 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: false,
       primaryKey: true
     },
+    firstName: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    lastName: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    birthday: {
+      type: DataTypes.DATE,
+      allowNull: false
+    },
     gender: {
       type: DataTypes.STRING(6),
       allowNull: false,
