@@ -12,7 +12,7 @@ var io = socketIo(server);
 
 // Parses the cookies from client
 io.use(socketJwt.authorize({
-  secret: 'testkey',
+  secret: process.env.JWT_KEY,
   handshake: true
 }));
 
