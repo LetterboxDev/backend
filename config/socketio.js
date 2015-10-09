@@ -1,8 +1,7 @@
 var http = require('http');
 var logger = require('./logger');
 var socketIo = require('socket.io');
-var cookieParser = require('socket.io-cookie');
-var auth = require('./socketauth');
+var socketJwt = require('socketio-jwt');
 var app = require('./express');
 
 // Server
@@ -12,8 +11,9 @@ var server = http.createServer(app).listen(app.get('port'), function(){
 var io = socketIo(server);
 
 // Parses the cookies from client
-io.use(cookieParser);
-// Checks if the socket is from a valid user
-io.use(auth.authenticate);
+io.use(socketJwt.authorize({
+  secret: 'testkey',
+  handshake: true
+}));
 
 module.exports = io;
