@@ -10,35 +10,51 @@ exports.getRandomQuestions = function(req, res) {
     ],
     limit: 5
   }).then(function(questions) {
+    questions = questions.get({plain: true});
+    questions.sort(function(questionA, questionB) {
+      return questionA.questionId - questionB.questionId;
+    });
     return res.send(questions);
   });
 };
 
-exports.putWyrSet = function(req, res) {
-  var questionIds = req.body.question_ids;
-  if (questionIds instanceof Array && questionIds.length === 5) {
+/**
+ * Request body:
+ * {
+ *   questions: [  
+ *     {
+ *       questionId: INT,
+ *       answer: BOOLEAN (option0: false, option1: true)
+ *     },
+ *     ...
+ *   ]
+ * }
+ */
+exports.putUserWyrQuestions = function(req, res) {
+  var questions = req.body.questions;
+  if (questions instanceof Array && questions.length === 5) {
     var prev;
-    questionIds.sort();
-    for (var i = 0; i < questionIds.length; i++) {
-      if (typeof questionIds[i] !== 'number') {
-        questionIds[i] = parseInt(questionIds[i]);
-      }
-      if (questionIds[i] === prev) {
+    questions.sort(function(questionA, questionB) {
+      return questionA.questionId - questionB.questionId;
+    });
+    for (var i = 0; i < questions.length; i++) {
+      if (questions[i].questionId === prev) {
         return res.status(400).send({
           error: 'repetition in id'
         });
       }
-      prev = questionIds[i];
+      prev = questions[i].questionId;
     }
     db.UserWyrQuestion.destroy({
       where: {
         UserAccountHashedId: req.user.hashedId
       }
     });
-    for (var i = 0; i < questionIds.length; i++) {
+    for (var i = 0; i < questions.length; i++) {
       db.UserWyrQuestion.create({
         UserAccountHashedId: req.user.hashedId,
-        WyrQuestionId: questionIds[i]
+        WyrQuestionId: questions[i].questionId,
+        answer: questions[i].answer
       });
     }
     return res.send({
