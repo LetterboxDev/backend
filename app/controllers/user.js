@@ -89,21 +89,10 @@ exports.storeUserData = function(req, res, next) {
       })
     }
     var encryptedToken = token.generateToken(hashedId);
-    res.cookie('letterbox_token', encryptedToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production'
-    });
     return res.status(200).send({
-      status: 'success'
+      status: 'success',
+      letterbox_token: encryptedToken
     });
-  });
-};
-
-exports.logout = function(req, res) {
-  res.clearCookie('letterbox_token');
-  return res.send({
-    status: 'successfully logged out',
-    user: req.user
   });
 };
 

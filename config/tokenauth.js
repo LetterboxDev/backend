@@ -3,8 +3,8 @@ var jwt = require('jsonwebtoken');
 var token = require('./token');
 var logger = require('./logger');
 
-exports.cookieAuth = function(req, res, next) {
-  var letterboxToken = req.cookies.letterbox_token;
+exports.authenticate = function(req, res, next) {
+  var letterboxToken = req.query.letterbox_token;
   req.user = {};
   req.authentication = {isAuthenticated: false};
   if (letterboxToken) {
@@ -27,19 +27,17 @@ exports.cookieAuth = function(req, res, next) {
           logger.info('User: ' + user.hashedId);
         } else {
           req.authentication.message = 'no user found';
-          res.clearCookie('letterbox_token');
           logger.info(req.authentication.message);
         }
         return next();
-      })
+      });
     } else {
       req.authentication.message = 'token expired';
-      res.clearCookie('letterbox_token');
       logger.info(req.authentication.message);
       return next();
     }
   } else {
-    req.authentication.message = 'no token found in cookies';
+    req.authentication.message = 'no token provided';
     logger.info(req.authentication.message);
     return next();
   }

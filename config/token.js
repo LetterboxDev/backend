@@ -1,6 +1,6 @@
 var jwt = require('jsonwebtoken');
 
-var key = 'testkey';
+var key = process.env.JWT_KEY;
 
 // generates a token for the a user with the corresponding hashedId
 exports.generateToken = function(hashedId) {
