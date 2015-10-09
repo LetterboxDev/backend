@@ -33,9 +33,12 @@ exports.checkFacebookTokenParam = function(req, res, next) {
 
 exports.validateFacebookToken = function(req, res, next) {
   graph.setAccessToken(req.fb_token);
-  graph.get('/me?fields=id,gender', function(err, fbResponse) {
+  graph.get('/me?fields=id,first_name,last_name,birthday,gender', function(err, fbResponse) {
     if (!err && fbResponse) {
       req.profileId = fbResponse.id;
+      req.firstName = fbResponse.first_name;
+      req.lastName = fbResponse.last_name;
+      req.birthday = new Date(fbResponse.birthday);
       req.gender = fbResponse.gender;
       return next();
     } else {
@@ -74,6 +77,9 @@ exports.storeUserData = function(req, res, next) {
       db.UserAccount.create({
         profileId: req.profileId,
         hashedId: hashedId,
+        firstName: req.firstName,
+        lastName: req.lastName,
+        birthday: req.birthday,
         gender: req.gender,
         accessToken: req.fb_token
       });
