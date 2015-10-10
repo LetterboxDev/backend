@@ -1,6 +1,7 @@
 var path = require('path');
 var rootPath = path.normalize(__dirname + '/..');
 var modelsPath = rootPath + '/app/models';
+var mysqlPassword = process.env.MYSQL_PASSWORD;
 
 module.exports = {
   development: {
@@ -16,7 +17,7 @@ module.exports = {
     db: {
       name: "letterbox",
       username: "root",
-      password: "admin",
+      password: mysqlPassword,
       host: "localhost",
       port: 3306
     }
