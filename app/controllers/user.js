@@ -94,7 +94,8 @@ exports.storeUserData = function(req, res, next) {
       letterbox_token: encryptedToken,
       user: {
         hashedId: hashedId,
-        firstName: req.firstName
+        firstName: user.firstName,
+        isRegistered: user.isRegistered
       }
     });
   });
