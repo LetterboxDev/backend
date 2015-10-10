@@ -91,7 +91,11 @@ exports.storeUserData = function(req, res, next) {
     var encryptedToken = token.generateToken(hashedId);
     return res.status(200).send({
       status: 'success',
-      letterbox_token: encryptedToken
+      letterbox_token: encryptedToken,
+      user: {
+        hashedId: hashedId,
+        firstName: req.firstName
+      }
     });
   });
 };
