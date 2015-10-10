@@ -73,6 +73,7 @@ exports.storeUserData = function(req, res, next) {
       hashedId: hashedId
     }
   }).then(function(user) {
+    var isRegistered = false;
     if (!user) {
       db.UserAccount.create({
         profileId: req.profileId,
@@ -86,7 +87,8 @@ exports.storeUserData = function(req, res, next) {
     } else {
       user.update({
         accessToken: req.fb_token
-      })
+      });
+      isRegistered = user.isRegistered;
     }
     var encryptedToken = token.generateToken(hashedId);
     return res.status(200).send({
@@ -94,8 +96,8 @@ exports.storeUserData = function(req, res, next) {
       letterbox_token: encryptedToken,
       user: {
         hashedId: hashedId,
-        firstName: user.firstName,
-        isRegistered: user.isRegistered
+        firstName: req.firstName,
+        isRegistered: isRegistered
       }
     });
   });
