@@ -157,7 +157,6 @@ exports.getUser = function(req, res, next, hashedId) {
 exports.getMatch = function(req, res, next) {
   var maxDistance = Number(req.query.maxDistance);
   if (typeof maxDistance === 'number') {
-    console.log('through');
     var myLat = req.user.latitude;
     var myLon = req.user.longitude;
     db.UserAccount.findOne({
@@ -209,6 +208,10 @@ exports.getMatch = function(req, res, next) {
           error: 'no match found'
         });
       }
+    });
+  } else {
+    return res.status(400).send({
+      error: 'invalid maxDistance'
     });
   }
 };
