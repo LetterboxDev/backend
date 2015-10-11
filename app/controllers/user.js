@@ -156,6 +156,20 @@ exports.getUser = function(req, res, next, hashedId) {
 
 exports.getMatch = function(req, res, next) {
   var maxDistance = Number(req.query.maxDistance);
+  var previousId = req.query.previousId;
+  var hashedIdCheck;
+  if (typeof previousId !== 'undefined') {
+    hashedIdCheck = {
+      $ne: req.user.hashedId
+    }
+  } else {
+    hashedIdCheck = {
+      $and: [
+        {$ne: req.user.hashedId},
+        {$ne: previousId}
+      ]
+    }
+  }
   if (maxDistance > 0) {
     var myLat = req.user.latitude;
     var myLon = req.user.longitude;
@@ -188,9 +202,7 @@ exports.getMatch = function(req, res, next) {
         ]
       ],
       where: {
-        hashedId: {
-          $ne: req.user.hashedId
-        },
+        hashedId: hashedIdCheck,
         gender: req.user.genderPreference,
         genderPreference: req.user.gender,
         isRegistered: true
