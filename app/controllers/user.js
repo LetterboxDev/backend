@@ -52,9 +52,9 @@ exports.validateFacebookToken = function(req, res, next) {
 
 exports.getMediumProfilePicture = function(req, res, next) {
   graph.setAccessToken(req.fb_token);
-  graph.get('/me/picture?height=400&width-400', function(err, fbResponse) {
+  graph.get('/me/picture?height=400&width=400', function(err, fbResponse) {
     if (!err && fbResponse) {
-      req.pictureMed = fbResponse.data.url;
+      req.pictureMed = fbResponse.location;
       return next();
     } else {
       return res.status(400).send({
@@ -118,6 +118,14 @@ exports.storeUserData = function(req, res, next) {
         isRegistered: isRegistered
       }
     });
+  });
+};
+
+exports.renewToken = function(req, res) {
+  var encryptedToken = token.generateToken(req.user.hashedId);
+  return res.status(200).send({
+    status: 'success',
+    letterbox_token: encryptedToken
   });
 };
 
