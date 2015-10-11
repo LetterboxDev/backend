@@ -45,7 +45,7 @@ exports.getOneRandomQuestion = function(req, res) {
  * {
  *   questions: [  
  *     {
- *       questionId: INT,
+ *       id: INT,
  *       answer: BOOLEAN (option0: false, option1: true)
  *     },
  *     ...
@@ -57,15 +57,15 @@ exports.putUserWyrQuestions = function(req, res) {
   if (questions instanceof Array && questions.length === 5) {
     var prev;
     questions.sort(function(questionA, questionB) {
-      return questionA.questionId - questionB.questionId;
+      return questionA.id - questionB.id;
     });
     for (var i = 0; i < questions.length; i++) {
-      if (questions[i].questionId === prev) {
+      if (questions[i].id === prev) {
         return res.status(400).send({
           error: 'repetition in id'
         });
       }
-      prev = questions[i].questionId;
+      prev = questions[i].id;
     }
     db.UserWyrQuestion.destroy({
       where: {
@@ -75,7 +75,7 @@ exports.putUserWyrQuestions = function(req, res) {
     for (var i = 0; i < questions.length; i++) {
       db.UserWyrQuestion.create({
         UserAccountHashedId: req.user.hashedId,
-        WyrQuestionId: questions[i].questionId,
+        WyrQuestionId: questions[i].id,
         answer: questions[i].answer
       });
     }
