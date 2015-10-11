@@ -252,7 +252,7 @@ exports.sendMatch = function(req, res) {
       bio: user.bio,
       pictureThumb: user.pictureThumb,
       pictureMed: user.pictureMed,
-      distance: req.matchingUser.distance,
+      distance: req.matchingUser.dataValues.distance,
       age: age,
       mutualFriends: []
     });
