@@ -42,7 +42,14 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: false,
       defaultValue: ''
     },
-    picture: {
+    pictureThumb: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        isUrl: true
+      }
+    },
+    pictureMed: {
       type: DataTypes.STRING,
       allowNull: false,
       validate: {
