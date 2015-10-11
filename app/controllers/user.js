@@ -33,19 +33,34 @@ exports.checkFacebookTokenParam = function(req, res, next) {
 
 exports.validateFacebookToken = function(req, res, next) {
   graph.setAccessToken(req.fb_token);
-  graph.get('/me?fields=id,first_name,last_name,birthday,gender', function(err, fbResponse) {
+  graph.get('/me?fields=id,first_name,last_name,birthday,gender,picture', function(err, fbResponse) {
     if (!err && fbResponse) {
       req.profileId = fbResponse.id;
       req.firstName = fbResponse.first_name;
       req.lastName = fbResponse.last_name;
       req.birthday = new Date(fbResponse.birthday);
       req.gender = fbResponse.gender;
+      req.pictureThumb = fbResponse.picture.data.url
       return next();
     } else {
       return res.status(400).send({
         error: 'invalid facebook access token'
       });
     }   
+  });
+};
+
+exports.getMediumProfilePicture = function(req, res, next) {
+  graph.setAccessToken(req.fb_token);
+  graph.get('/me/picture?height=400&width-400', function(err, fbResponse) {
+    if (!err && fbResponse) {
+      req.pictureMed = fbResponse.data.url;
+      return next();
+    } else {
+      return res.status(400).send({
+        error: 'unable to retrieve medium profile picture'
+      })
+    }
   });
 };
 
@@ -81,6 +96,9 @@ exports.storeUserData = function(req, res, next) {
         firstName: req.firstName,
         lastName: req.lastName,
         birthday: req.birthday,
+        bio: '',
+        pictureThumb: req.pictureThumb,
+        pictureMed: req.pictureMed,
         gender: req.gender,
         accessToken: req.fb_token
       });
@@ -126,6 +144,42 @@ exports.getUser = function(req, res, next, hashedId) {
   });
 };
 
+exports.updateLocation = function(req, res) {
+  var latitude = req.body.latitude;
+  var longitude = req.body.longitude;
+  if (isFloat(latitude) && isFloat(longitude)) {
+    req.user.update({
+      latitude: latitude,
+      longitude: longitude
+    }).then(function(user) {
+      return res.send({
+        status: 'success'
+      });
+    });
+  } else {
+    return res.status(400).send({
+      error: 'invalid coordinates'
+    });
+  }
+};
+
+exports.updateBio = function(req, res) {
+  var bio = req.body.bio;
+  if (typeof bio === 'string') {
+    req.user.update({
+      bio: bio
+    }).then(function(user) {
+      return res.send({
+        status: 'success'
+      });
+    });
+  } else {
+    return res.status(400).send({
+      error: 'invalid bio'
+    });
+  }
+};
+
 exports.getSelf = function(req, res) {
   var questions = [];
   for (var i = 0; i < req.user.UserWyrQuestions.length; i++) {
@@ -134,7 +188,9 @@ exports.getSelf = function(req, res) {
   return res.send({
     hashedId: req.user.hashedId,
     gender: req.user.gender,
-    questions: questions
+    questions: questions,
+    pictureThumb: req.user.pictureThumb,
+    pictureMed: req.user.pictureMed
   });
 };
 
@@ -146,6 +202,12 @@ exports.getOtherUser = function(req, res) {
   return res.send({
     hashedId: req.otherUser.hashedId,
     gender: req.otherUser.gender,
-    questions: questions
+    questions: questions,
+    pictureThumb: req.user.pictureThumb,
+    pictureMed: req.user.pictureMed
   });
 };
+
+function isFloat(n) {
+  return n === Number(n) && n % 1 !== 0;
+}
