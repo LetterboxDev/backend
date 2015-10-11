@@ -27,6 +27,39 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: false,
       isIn: [['male', 'female']]
     },
+    genderPreference: {
+      type: DataTypes.STRING(6),
+      allowNull: false,
+      isIn: [['male', 'female']]
+    },
+    latitude: {
+      type: DataTypes.DOUBLE,
+      allowNull: false,
+      defaultValue: 1.3 // Defaults to Singapore latitude
+    },
+    longitude: {
+      type: DataTypes.DOUBLE,
+      allowNull: false,
+      defaultValue: 103.8 // Defaults to Singapore longitude
+    },
+    bio: {
+      type: DataTypes.TEXT,
+      allowNull: false
+    },
+    pictureThumb: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        isUrl: true
+      }
+    },
+    pictureMed: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        isUrl: true
+      }
+    },
     accessToken: {
       type: DataTypes.STRING,
       allowNull: false
