@@ -10,7 +10,6 @@ exports.getRandomQuestions = function(req, res) {
     ],
     limit: 5
   }).then(function(questions) {
-    questions = questions.get({plain: true});
     questions.sort(function(questionA, questionB) {
       return questionA.questionId - questionB.questionId;
     });
