@@ -16,19 +16,28 @@ exports.getRandomQuestions = function(req, res) {
 
 exports.getOneRandomQuestion = function(req, res) {
   var currentIds = req.query.currentQuestionIds;
-  currentIds = typeof currentIds !== 'undefined' && currentIds.constructor === Array ? currentIds : [];
-  db.WyrQuestion.findOne({
-    where: {
-      id: {
-        $notIn: currentIds
-      }
-    },
-    order: [
-      db.Sequelize.fn('RAND')
-    ]
-  }).then(function(question) {
-    return res.send(question);
-  });
+  if (currentIds !== 'undefined' && currentIds.constructor === Array) {
+    db.WyrQuestion.findOne({
+      where: {
+        id: {
+          $notIn: currentIds
+        }
+      },
+      order: [
+        db.Sequelize.fn('RAND')
+      ]
+    }).then(function(question) {
+      return res.send(question);
+    });
+  } else {
+    db.WyrQuestion.findOne({
+      order: [
+        db.Sequelize.fn('RAND')
+      ]
+    }).then(function(question) {
+      return res.send(question);
+    });
+  }
 };
 
 /**
