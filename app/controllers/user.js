@@ -321,9 +321,13 @@ exports.getSelf = function(req, res) {
   for (var i = 0; i < req.user.UserWyrQuestions.length; i++) {
     questions.push(req.user.UserWyrQuestions[i].WyrQuestion);
   }
+  var age = (new Date()).getYear() - req.user.birthday.getYear();
   return res.send({
     hashedId: req.user.hashedId,
     gender: req.user.gender,
+    firstName: req.user.firstName,
+    bio: req.user.bio,
+    age: age,
     questions: questions,
     pictureThumb: req.user.pictureThumb,
     pictureMed: req.user.pictureMed
@@ -335,12 +339,17 @@ exports.getOtherUser = function(req, res) {
   for (var i = 0; i < req.otherUser.UserWyrQuestions.length; i++) {
     questions.push(req.otherUser.UserWyrQuestions[i].WyrQuestion);
   }
+  var age = (new Date()).getYear() - req.otherUser.birthday.getYear();
   return res.send({
     hashedId: req.otherUser.hashedId,
     gender: req.otherUser.gender,
+    firstName: req.otherUser.firstName,
+    bio: req.otherUser.bio,
+    age: age,
     questions: questions,
-    pictureThumb: req.user.pictureThumb,
-    pictureMed: req.user.pictureMed
+    pictureThumb: req.otherUser.pictureThumb,
+    pictureMed: req.otherUser.pictureMed,
+    mutualFriends: []
   });
 };
 
