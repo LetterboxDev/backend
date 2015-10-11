@@ -14,6 +14,23 @@ exports.getRandomQuestions = function(req, res) {
   });
 };
 
+exports.getOneRandomQuestion = function(req, res) {
+  var currentIds = req.query.currentQuestionIds;
+  currentIds = typeof currentIds !== 'undefined' && currentIds.constructor === Array ? currentIds : [];
+  db.WyrQuestion.findOne({
+    where: {
+      id: {
+        $notIn: currentIds
+      }
+    },
+    order: [
+      db.Sequelize.fn('RAND')
+    ]
+  }).then(function(question) {
+    return res.send(question);
+  });
+};
+
 /**
  * Request body:
  * {
