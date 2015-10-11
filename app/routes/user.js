@@ -8,6 +8,9 @@ exports.init = function(app) {
   app.get('/user/id/:hashedId', userController.requireAuthentication, userController.getOtherUser);
   app.put('/user/location', userController.requireAuthentication, userController.updateLocation);
   app.put('/user/bio', userController.requireAuthentication, userController.updateBio);
+  app.put('/user/gender', userController.requireAuthentication, userController.updateGender);
+
+  app.get('/match', userController.requireAuthentication, userController.getMatch);
   
   app.param('hashedId', userController.getUser);
 };

@@ -27,6 +27,11 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: false,
       isIn: [['male', 'female']]
     },
+    genderPreference: {
+      type: DataTypes.STRING(6),
+      allowNull: false,
+      isIn: [['male', 'female']]
+    },
     latitude: {
       type: DataTypes.DOUBLE,
       allowNull: false,

@@ -89,6 +89,7 @@ exports.storeUserData = function(req, res, next) {
     }
   }).then(function(user) {
     var isRegistered = false;
+    var genderPreference = req.gender === 'male' ? 'female' : 'male';
     if (!user) {
       db.UserAccount.create({
         profileId: req.profileId,
@@ -100,6 +101,7 @@ exports.storeUserData = function(req, res, next) {
         pictureThumb: req.pictureThumb,
         pictureMed: req.pictureMed,
         gender: req.gender,
+        genderPreference: genderPreference,
         accessToken: req.fb_token
       });
     } else {
@@ -152,6 +154,10 @@ exports.getUser = function(req, res, next, hashedId) {
   });
 };
 
+exports.getMatch = function(req, res) {
+  
+};
+
 exports.updateLocation = function(req, res) {
   var latitude = req.body.latitude;
   var longitude = req.body.longitude;
@@ -184,6 +190,27 @@ exports.updateBio = function(req, res) {
   } else {
     return res.status(400).send({
       error: 'invalid bio'
+    });
+  }
+};
+
+exports.updateGender = function(req, res) {
+  var validGenders = ['male', 'female'];
+  var gender = req.body.gender;
+  var genderPreference = req.body.genderPreference;
+
+  if (validGenders.indexOf(gender) > -1 && validGenders.indexOf(genderPreference) > -1) {
+    req.user.update({
+      gender: gender,
+      genderPreference: genderPreference
+    }).then(function(user) {
+      return res.send({
+        status: 'success'
+      });
+    });
+  } else {
+    return res.status(400).send({
+      error: 'invalid genders'
     });
   }
 };
