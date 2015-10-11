@@ -154,9 +154,95 @@ exports.getUser = function(req, res, next, hashedId) {
   });
 };
 
-exports.getMatch = function(req, res) {
-  
+exports.getMatch = function(req, res, next) {
+  var maxDistance = Number(req.query.maxDistance);
+  if (typeof maxDistance === 'number') {
+    console.log('through');
+    var myLat = req.user.latitude;
+    var myLon = req.user.longitude;
+    db.UserAccount.findOne({
+      attributes: [
+        'hashedId',
+        [
+          db.Sequelize.fn('ABS', db.Sequelize.where(
+            db.Sequelize.fn('ACOS',
+              db.Sequelize.where(
+                db.Sequelize.where(
+                  db.Sequelize.fn('cos', db.Sequelize.fn('radians', db.Sequelize.literal(myLat))), '*',
+                  db.Sequelize.where(
+                    db.Sequelize.fn('cos', db.Sequelize.fn('radians', db.Sequelize.col('latitude'))), '*',
+                    db.Sequelize.fn('cos', db.Sequelize.where(
+                      db.Sequelize.fn('radians', db.Sequelize.col('longitude')), '-',
+                      db.Sequelize.fn('radians', db.Sequelize.literal(myLon))
+                    ))
+                  )
+                ), '+',
+                db.Sequelize.where(
+                  db.Sequelize.fn('sin', db.Sequelize.fn('radians', db.Sequelize.literal(myLat))), '*',
+                  db.Sequelize.fn('sin', db.Sequelize.fn('radians', db.Sequelize.col('latitude')))
+                )
+              )
+            ),
+            '*',6371)
+          ),
+          'distance'
+        ]
+      ],
+      where: {
+        hashedId: {
+          $ne: req.user.hashedId
+        },
+        gender: req.user.genderPreference,
+        genderPreference: req.user.gender,
+        isRegistered: true
+      },
+      having: [
+        'distance <= ?', maxDistance
+      ],
+      order: [db.Sequelize.fn('RAND')]
+    }).then(function(user) {
+      if (user) {
+        req.matchingUser = user;
+        return next();
+      } else {
+        return res.status(400).send({
+          error: 'no match found'
+        });
+      }
+    });
+  }
 };
+
+exports.sendMatch = function(req, res) {
+  db.UserAccount.findOne({
+    where: {
+      hashedId: req.matchingUser.hashedId
+    },
+    include: [
+      {
+        model: db.UserWyrQuestion,
+        include: db.WyrQuestion
+      }
+    ]
+  }).then(function(user) {
+    var questions = [];
+    for (var i = 0; i < user.UserWyrQuestions.length; i++) {
+      questions.push(user.UserWyrQuestions[i].WyrQuestion);
+    }
+    var age = (new Date()).getYear() - user.birthday.getYear();
+    return res.send({
+      hashedId: user.hashedId,
+      firstName: user.firstName,
+      questions: questions,
+      bio: user.bio,
+      pictureThumb: user.pictureThumb,
+      pictureMed: user.pictureMed,
+      distance: req.matchingUser.distance,
+      age: age,
+      mutualFriends: []
+    });
+  });
+}
 
 exports.updateLocation = function(req, res) {
   var latitude = req.body.latitude;
