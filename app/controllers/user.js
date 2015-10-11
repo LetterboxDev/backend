@@ -158,7 +158,7 @@ exports.getMatch = function(req, res, next) {
   var maxDistance = Number(req.query.maxDistance);
   var previousId = req.query.previousId;
   var hashedIdCheck;
-  if (typeof previousId !== 'undefined') {
+  if (typeof previousId === 'undefined') {
     hashedIdCheck = {
       $ne: req.user.hashedId
     }
