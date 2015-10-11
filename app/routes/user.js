@@ -10,7 +10,7 @@ exports.init = function(app) {
   app.put('/user/bio', userController.requireAuthentication, userController.updateBio);
   app.put('/user/gender', userController.requireAuthentication, userController.updateGender);
 
-  app.get('/match', userController.requireAuthentication, userController.getMatch);
+  app.get('/match', userController.requireAuthentication, userController.getMatch, userController.sendMatch);
   
   app.param('hashedId', userController.getUser);
 };
