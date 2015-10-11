@@ -16,7 +16,7 @@ exports.getRandomQuestions = function(req, res) {
 
 exports.getOneRandomQuestion = function(req, res) {
   var currentIds = req.query.currentQuestionIds;
-  if (currentIds !== 'undefined' && currentIds.constructor === Array) {
+  if (typeof currentIds !== 'undefined' && currentIds.constructor === Array) {
     db.WyrQuestion.findOne({
       where: {
         id: {
