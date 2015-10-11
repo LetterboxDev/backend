@@ -79,6 +79,9 @@ exports.putUserWyrQuestions = function(req, res) {
         answer: questions[i].answer
       });
     }
+    req.user.update({
+      isRegistered: true
+    });
     return res.send({
       status: 'success'
     });
