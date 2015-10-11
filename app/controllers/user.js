@@ -156,7 +156,7 @@ exports.getUser = function(req, res, next, hashedId) {
 
 exports.getMatch = function(req, res, next) {
   var maxDistance = Number(req.query.maxDistance);
-  if (typeof maxDistance === 'number') {
+  if (maxDistance > 0) {
     var myLat = req.user.latitude;
     var myLon = req.user.longitude;
     db.UserAccount.findOne({
