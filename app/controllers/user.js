@@ -52,6 +52,19 @@ var getHashedIdCheckClause = function(userHashedId, previousId) {
   }
 };
 
+var degToRad = function(deg) {
+  return deg * Math.PI / 180;
+};
+
+var getDistanceBetweenUsers = function(user1, user2) {
+  return Math.abs(
+    6371 * Math.acos(
+      Math.cos(degToRad(user1.latitude))*Math.cos(degToRad(user2.latitude))*Math.cos(degToRad(user2.longitude)-degToRad(user1.longitude))+
+      Math.sin(degToRad(user1.latitude))*Math.sin(degToRad(user2.latitude))
+    )
+  );
+};
+
 /**
  *  To be called any time an API requires authentication
  */
@@ -287,15 +300,12 @@ exports.getMultipleMatches = function(req, res, next) {
       }).then(function(users) {
         if (users.length !== 0) {
           var matches = [];
-          var idToDistanceMap = {};
           for (var i = 0; i < users.length; i++) {
             var user = users[i];
             matches.push(user.hashedId);
-            idToDistanceMap[user.hashedId] = user.distance;
           }
           req.matches = matches;
-          req.distanceMap = idToDistanceMap;
-          next();
+          return next();
         } else {
           return res.status(400).send({
             error: 'no match found'
@@ -340,7 +350,7 @@ exports.sendMultipleMatches = function(req, res) {
         bio: user.bio,
         pictureThumb: user.pictureThumb,
         pictureMed: user.pictureMed,
-        distance: req.distanceMap[user.hashedId],
+        distance: getDistanceBetweenUsers(req.user, user),
         age: age,
         mutualFriends: []
       });
