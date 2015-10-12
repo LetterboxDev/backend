@@ -7,6 +7,51 @@ var token = require('../../config/token');
 var db = require('../../config/sequelize');
 var graph = require('fbgraph');
 
+var getDistanceMatchAttributes = function(myLat, myLon) {
+  return [
+    'hashedId',
+    [
+      db.Sequelize.fn('ABS', db.Sequelize.where(
+        db.Sequelize.fn('ACOS',
+          db.Sequelize.where(
+            db.Sequelize.where(
+              db.Sequelize.fn('cos', db.Sequelize.fn('radians', db.Sequelize.literal(myLat))), '*',
+              db.Sequelize.where(
+                db.Sequelize.fn('cos', db.Sequelize.fn('radians', db.Sequelize.col('latitude'))), '*',
+                db.Sequelize.fn('cos', db.Sequelize.where(
+                  db.Sequelize.fn('radians', db.Sequelize.col('longitude')), '-',
+                  db.Sequelize.fn('radians', db.Sequelize.literal(myLon))
+                ))
+              )
+            ), '+',
+            db.Sequelize.where(
+              db.Sequelize.fn('sin', db.Sequelize.fn('radians', db.Sequelize.literal(myLat))), '*',
+              db.Sequelize.fn('sin', db.Sequelize.fn('radians', db.Sequelize.col('latitude')))
+            )
+          )
+        ),
+        '*',6371)
+      ),
+      'distance'
+    ]
+  ];
+};
+
+var getHashedIdCheckClause = function(userHashedId, previousId) {
+  if (typeof previousId === 'undefined') {
+    return {
+      $ne: userHashedId
+    };
+  } else {
+    return {
+      $and: [
+        {$ne: userHashedId},
+        {$ne: previousId}
+      ]
+    };
+  }
+};
+
 /**
  *  To be called any time an API requires authentication
  */
@@ -157,59 +202,19 @@ exports.getUser = function(req, res, next, hashedId) {
 exports.getMatch = function(req, res, next) {
   var maxDistance = Number(req.query.maxDistance);
   var previousId = req.query.previousId;
-  var hashedIdCheck;
-  if (typeof previousId === 'undefined') {
-    hashedIdCheck = {
-      $ne: req.user.hashedId
-    }
-  } else {
-    hashedIdCheck = {
-      $and: [
-        {$ne: req.user.hashedId},
-        {$ne: previousId}
-      ]
-    }
-  }
+  var hashedIdCheck = getHashedIdCheckClause(req.user.hashedId, previousId);
   if (maxDistance > 0) {
     var myLat = req.user.latitude;
     var myLon = req.user.longitude;
     db.UserAccount.findOne({
-      attributes: [
-        'hashedId',
-        [
-          db.Sequelize.fn('ABS', db.Sequelize.where(
-            db.Sequelize.fn('ACOS',
-              db.Sequelize.where(
-                db.Sequelize.where(
-                  db.Sequelize.fn('cos', db.Sequelize.fn('radians', db.Sequelize.literal(myLat))), '*',
-                  db.Sequelize.where(
-                    db.Sequelize.fn('cos', db.Sequelize.fn('radians', db.Sequelize.col('latitude'))), '*',
-                    db.Sequelize.fn('cos', db.Sequelize.where(
-                      db.Sequelize.fn('radians', db.Sequelize.col('longitude')), '-',
-                      db.Sequelize.fn('radians', db.Sequelize.literal(myLon))
-                    ))
-                  )
-                ), '+',
-                db.Sequelize.where(
-                  db.Sequelize.fn('sin', db.Sequelize.fn('radians', db.Sequelize.literal(myLat))), '*',
-                  db.Sequelize.fn('sin', db.Sequelize.fn('radians', db.Sequelize.col('latitude')))
-                )
-              )
-            ),
-            '*',6371)
-          ),
-          'distance'
-        ]
-      ],
+      attributes: getDistanceMatchAttributes(myLat, myLon),
       where: {
         hashedId: hashedIdCheck,
         gender: req.user.genderPreference,
         genderPreference: req.user.gender,
         isRegistered: true
       },
-      having: [
-        'distance <= ?', maxDistance
-      ],
+      having: ['distance <= ?', maxDistance],
       order: [db.Sequelize.fn('RAND')]
     }).then(function(user) {
       if (user) {
@@ -258,6 +263,91 @@ exports.sendMatch = function(req, res) {
     });
   });
 }
+
+exports.getMultipleMatches = function(req, res, next) {
+  var maxDistance = Number(req.query.maxDistance);
+  var limit = Number(req.query.limit);
+  var previousId = req.query.previousId;
+  var hashedIdCheck = getHashedIdCheckClause(req.user.hashedId, previousId);
+  if (limit > 0) {
+    if (maxDistance > 0) {
+      var myLat = req.user.latitude;
+      var myLon = req.user.longitude;
+      db.UserAccount.findAll({
+        attributes: getDistanceMatchAttributes(myLat, myLon),
+        where: {
+          hashedId: hashedIdCheck,
+          gender: req.user.genderPreference,
+          genderPreference: req.user.gender,
+          isRegistered: true
+        },
+        having: ['distance <= ?', maxDistance],
+        order: [db.Sequelize.fn('RAND')],
+        limit: limit
+      }).then(function(users) {
+        if (users.length !== 0) {
+          var matches = [];
+          var idToDistanceMap = {};
+          for (var i = 0; i < users.length; i++) {
+            var user = users[i];
+            matches.push(user.hashedId);
+            idToDistanceMap[user.hashedId] = user.distance;
+          }
+          req.matches = matches;
+          req.distanceMap = idToDistanceMap;
+          next();
+        } else {
+          return res.status(400).send({
+            error: 'no match found'
+          });
+        }
+      });
+    } else {
+      return res.status(400).send({
+        error: 'invalid maxDistance'
+      });
+    }
+  } else {
+    return res.status(400).send({
+      error: 'invalid limit'
+    });
+  }
+};
+
+exports.sendMultipleMatches = function(req, res) {
+  db.UserAccount.findAll({
+    where: {
+      hashedId: {$in: req.matches}
+    },
+    include: [{
+      model: db.UserWyrQuestion,
+      include: db.WyrQuestion
+    }],
+    order: [db.Sequelize.fn('RAND')]
+  }).then(function(users) {
+    var matchedUsers = [];
+    for (var j = 0; j < users.length; j++) {
+      var user = users[j];
+      var questions = [];
+      for (var i = 0; i < user.UserWyrQuestions.length; i++) {
+        questions.push(user.UserWyrQuestions[i].WyrQuestion);
+      }
+      var age = (new Date()).getYear() - user.birthday.getYear();
+      matchedUsers.push({
+        hashedId: user.hashedId,
+        firstName: user.firstName,
+        questions: questions,
+        bio: user.bio,
+        pictureThumb: user.pictureThumb,
+        pictureMed: user.pictureMed,
+        distance: req.distanceMap[user.hashedId],
+        age: age,
+        mutualFriends: []
+      });
+    }
+    return res.send(matchedUsers);
+  });
+};
 
 exports.updateLocation = function(req, res) {
   var latitude = req.body.latitude;
