@@ -21,9 +21,11 @@ io.on('connection', function(socket) {
     if (data.otherUser) {
       var hash = db.Room.generateRoomHash(self, other);
       db.Room.findOrCreate({
-        hash: hash,
-        user1: self < other ? self : other,
-        user2: self > other ? self : other
+        where: {
+          hash: hash,
+          user1: self < other ? self : other,
+          user2: self > other ? self : other
+        }
       }).then(function(room) {
         var user1 = room.user1, user2 = room.user2;
         if (countUserConnections(user1)) {
