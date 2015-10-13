@@ -10,11 +10,20 @@ var db = require(__dirname + '/config/sequelize');
 // Socket.io configuration
 var io = require('./config/socketio');
 
+// Sockets
+var socketsDir = __dirname + '/app/sockets';
+var socketFiles = fs.readdirSync(socketsDir);
+
+socketFiles.forEach(function(file) {
+  require(socketsDir + '/' + file);
+  logger.info("Added socket: " + file);
+});
+
 // Routes
 var routesDir = __dirname + '/app/routes';
-var files = fs.readdirSync(routesDir);
+var routeFiles = fs.readdirSync(routesDir);
 
-files.forEach(function (file) {
+routeFiles.forEach(function(file) {
   route = require(routesDir + '/' + file);
   route.init(app);
   logger.info("Added route: " + file);
