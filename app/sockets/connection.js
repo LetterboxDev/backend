@@ -1,16 +1,7 @@
 var db = require('../../config/sequelize');
 var io = require('../../config/socketio');
 var logger = require('../../config/logger');
-
-var countUserConnections = function(hashedId) {
-  var count = 0;
-  var namespace = io.of('/');
-  for (var id in namespace.connected) {
-    var index = namespace.connected[id].rooms.indexOf(hashedId);
-    if (index !== -1) count++;
-  }
-  return count;
-};
+var connectionsCounter = require('./countconnections');
 
 io.on('connection', function(socket) {
   logger.info('connection established with: ' + socket.decoded_token.hashedId);
@@ -26,7 +17,7 @@ io.on('connection', function(socket) {
         user2: self > other ? self : other
       }).then(function(room) {
         var user1 = room.user1, user2 = room.user2;
-        if (countUserConnections(user1)) {
+        if (connectionsCounter.countUserConnections(user1)) {
           logger.info('user1 (' + user1 + ') found');
           io.to(user1).emit('roomCreated', {
             hash: room.hash
@@ -35,7 +26,7 @@ io.on('connection', function(socket) {
           logger.info('user1 (' + user1 + ') not found');
           // send notification
         }
-        if (countUserConnections(user2)) {
+        if (connectionsCounter.countUserConnections(user2)) {
           logger.info('user2 (' + user2 + ') found');
           io.to(user2).emit('roomCreated', {
             hash: room.hash
@@ -51,7 +42,7 @@ io.on('connection', function(socket) {
     if (data.roomHash) {
       db.Room.findOne({hash: data.roomHash}).then(function(room) {
         var user1 = room.user1, user2 = room.user2;
-        if (countUserConnections(user1)) {
+        if (connectionsCounter.countUserConnections(user1)) {
           logger.info('user1 (' + user1 + ') found');
           io.to(user1).emit('roomMessage', {
             author: socket.decoded_token.hashedId,
@@ -62,7 +53,7 @@ io.on('connection', function(socket) {
           logger.info('user1 (' + user1 + ') not found');
           // send notification
         }
-        if (countUserConnections(user2)) {
+        if (connectionsCounter.countUserConnections(user2)) {
           logger.info('user2 (' + user2 + ') found');
           io.to(user2).emit('roomMessage', {
             author: socket.decoded_token.hashedId,
