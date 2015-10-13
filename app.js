@@ -11,13 +11,9 @@ var db = require(__dirname + '/config/sequelize');
 var io = require('./config/socketio');
 
 // Sockets
-var socketsDir = __dirname + '/app/sockets';
-var socketFiles = fs.readdirSync(socketsDir);
-
-socketFiles.forEach(function(file) {
-  require(socketsDir + '/' + file);
-  logger.info("Added socket: " + file);
-});
+var socketsPath = __dirname + '/app/sockets/connection.js';
+require(socketsPath);
+logger.info("Added socket: connection.js");
 
 // Routes
 var routesDir = __dirname + '/app/routes';
