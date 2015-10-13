@@ -20,7 +20,7 @@ io.on('connection', function(socket) {
     var other = data.otherUser;
     if (data.otherUser) {
       var hash = db.Room.generateRoomHash(self, other);
-      db.Room.create({
+      db.Room.findOrCreate({
         hash: hash,
         user1: self < other ? self : other,
         user2: self > other ? self : other
