@@ -1,7 +1,7 @@
 // Message Buffer schema
 module.exports = function(sequelize, DataTypes) {
   var Message = sequelize.define('Message', {
-    from: {
+    sender: {
       type: DataTypes.STRING(32),
       allowNull: false,
       references: {
@@ -9,7 +9,7 @@ module.exports = function(sequelize, DataTypes) {
         key: 'hashedId'
       }
     },
-    to: {
+    recipient: {
       type: DataTypes.STRING(32),
       allowNull: false,
       references: {
@@ -17,16 +17,21 @@ module.exports = function(sequelize, DataTypes) {
         key: 'hashedId'
       }
     },
-    message: {
+    content: {
       type: DataTypes.TEXT,
       allowNull: false
     },
-    sentTime: {
+    timeSent: {
       type: DataTypes.INTEGER,
       allowNull: false
+    },
+    isRead: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false
     }
   }, {
-    timestamps: true, // sets createdAt and updatedAt
+    timestamps: false, // sets createdAt and updatedAt
     paranoid: false, // disables soft deletion
   });
 
