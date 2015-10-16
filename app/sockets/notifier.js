@@ -30,4 +30,12 @@ exports.notifyOfRoom = function(letterSender, room) {
   } else {
     // send notification
   }
-}
+};
+
+exports.notifyOfMessage = function(senderName, message) {
+  if (connectionsCounter.countUserConnections(message.recipient)) {
+    io.to(message.recipient).emit('roomMessage', message);
+  } else {
+    // send notification of message from senderName
+  }
+};
