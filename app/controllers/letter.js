@@ -89,7 +89,9 @@ exports.createLetter = function(req, res) {
 exports.checkLetterHashExists = function(req, res, next) {
   var hash = db.Letter.generateLetterHash(req.user.hashedId, req.recipient.hashedId);
   db.Letter.findOne({
-    hash: hash
+    where: {
+      hash: hash      
+    }
   }).then(function(letter) {
     if (!letter) {
       req.letterHash = hash;
