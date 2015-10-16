@@ -39,10 +39,16 @@ exports.getRoom = function(req, res, next, roomId) {
 };
 
 exports.getRoomMessages = function(req, res) {
+  var whereClause = {
+    RoomHash: req.room.hash
+  };
+  if (req.query.since) {
+    whereClause.timeSent = {
+      $gt: req.query.since
+    };
+  }
   db.Message.findAll({
-    where: {
-      RoomHash: req.room.hash
-    },
+    where: whereClause,
     order: [['timeSent', 'ASC']]
   }).then(function(messages) {
     return res.send(messages);
