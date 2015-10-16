@@ -219,13 +219,15 @@ exports.getMatch = function(req, res, next) {
   if (maxDistance > 0) {
     var myLat = req.user.latitude;
     var myLon = req.user.longitude;
+    var oneMonthAgo = new Date(Date.now() - 2628000000);
     db.UserAccount.findOne({
       attributes: getDistanceMatchAttributes(myLat, myLon),
       where: {
         hashedId: hashedIdCheck,
         gender: req.user.genderPreference,
         genderPreference: req.user.gender,
-        isRegistered: true
+        isRegistered: true,
+        $and: [['`hashedId` NOT IN (SELECT `recipient` FROM `Letters` WHERE `UserAccountHashedId`=? AND (`createdAt`>? OR `isApproved`=1))', req.user.hashedId, oneMonthAgo]]
       },
       having: ['distance <= ?', maxDistance],
       order: [db.Sequelize.fn('RAND')]
@@ -286,13 +288,15 @@ exports.getMultipleMatches = function(req, res, next) {
     if (maxDistance > 0) {
       var myLat = req.user.latitude;
       var myLon = req.user.longitude;
+      var oneMonthAgo = new Date(Date.now() - 2628000000);
       db.UserAccount.findAll({
         attributes: getDistanceMatchAttributes(myLat, myLon),
         where: {
           hashedId: hashedIdCheck,
           gender: req.user.genderPreference,
           genderPreference: req.user.gender,
-          isRegistered: true
+          isRegistered: true,
+          $and: [['`hashedId` NOT IN (SELECT `recipient` FROM `Letters` WHERE `UserAccountHashedId`=? AND (`createdAt`>? OR `isApproved`=1))', req.user.hashedId, oneMonthAgo]]
         },
         having: ['distance <= ?', maxDistance],
         order: [db.Sequelize.fn('RAND')],
