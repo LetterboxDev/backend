@@ -59,6 +59,7 @@ exports.getSingleRoom = function(req, res) {
       room.userName = user.firstName;
       room.thumbnail = user.pictureThumb;
       room.profilePicture = user.pictureMed;
+      room.createdAt = req.room.createdAt;
       room.latestMessage = {};
       if (latestMessage) {
         room.latestMessage.sender = latestMessage.sender;
