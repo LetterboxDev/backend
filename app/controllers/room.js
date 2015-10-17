@@ -41,13 +41,14 @@ exports.getRooms = function(req, res) {
 };
 
 exports.getSingleRoom = function(req, res) {
-  var room = req.room.get({plain: true});
   var otherUserHash = room.user1 !== req.user.hashedId ? room.user1 : room.user2;
   db.UserAccount.findAll({
     where: {
       hashedId: otherUserHash
     }
   }).then(function(user) {
+    var room = {};
+    room.hash = req.room.hash;
     room.userId = user.hashedId;
     room.userName = user.firstName;
     room.thumbnail = user.pictureThumb;
