@@ -22,7 +22,7 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: false
     },
     timeSent: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.BIGINT,
       allowNull: false
     },
     isRead: {
