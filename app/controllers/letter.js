@@ -20,7 +20,9 @@ exports.getLetter = function(req, res, next, hash) {
 exports.getLetters = function(req, res) {
   db.Letter.findAll({
     where: {
-      recipient: req.user.hashedId
+      recipient: req.user.hashedId,
+      isApproved: false,
+      isRejected: false
     },
     include: [{
       model: db.LetterAnswer,
@@ -124,6 +126,7 @@ exports.getRecipient = function(req, res, next) {
 exports.approveLetter = function(req, res) {
   if (req.letter.recipient === req.user.hashedId) {
     req.letter.update({
+      isRead: true,
       isApproved: true
     }).then(function(letter) {
       var roomHash = db.Room.generateRoomHash(req.user.hashedId, req.letter.UserAccountHashedId);
@@ -154,6 +157,19 @@ exports.approveLetter = function(req, res) {
   } else {
     return res.status(401).send({
       error: 'unauthorized'
+    });
+  }
+};
+
+exports.rejectLetter = function(req, res) {
+  if (req.letter.recipient === req.user.hashedId) {
+    req.letter.update({
+      isRead: true,
+      isRejected: true
+    }).then(function(letter) {
+      return res.send({
+        status: 'success'
+      });
     });
   }
 };
