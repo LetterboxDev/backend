@@ -47,13 +47,26 @@ exports.getSingleRoom = function(req, res) {
       hashedId: otherUserHash
     }
   }).then(function(user) {
-    var room = {};
-    room.hash = req.room.hash;
-    room.userId = user.hashedId;
-    room.userName = user.firstName;
-    room.thumbnail = user.pictureThumb;
-    room.profilePicture = user.pictureMed;
-    return res.send(room);
+    db.Message.findOne({
+      where: {
+        RoomHash: req.room.hash
+      },
+      order: [['timeSent', 'DESC']]
+    }).then(function(latestMessage) {
+      var room = {};
+      room.hash = req.room.hash;
+      room.userId = user.hashedId;
+      room.userName = user.firstName;
+      room.thumbnail = user.pictureThumb;
+      room.profilePicture = user.pictureMed;
+      room.latestMessage = {};
+      if (latestMessage) {
+        room.latestMessage.sender = latestMessage.sender;
+        room.latestMessage.content = latestMessage.content;
+        room.latestMessage.timeSent = latestMessage.timeSent;
+      }
+      return res.send(room);
+    })
   });
 };
 
