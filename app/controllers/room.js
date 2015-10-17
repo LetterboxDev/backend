@@ -42,7 +42,7 @@ exports.getRooms = function(req, res) {
 
 exports.getSingleRoom = function(req, res) {
   var otherUserHash = req.room.user1 !== req.user.hashedId ? req.room.user1 : req.room.user2;
-  db.UserAccount.findAll({
+  db.UserAccount.findOne({
     where: {
       hashedId: otherUserHash
     }
