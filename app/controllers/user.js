@@ -280,8 +280,22 @@ exports.sendMatch = function(req, res) {
           mutualFriends: fbResponse.context.mutual_friends
         });
       } else {
-        return res.status(400).send({
-          error: 'invalid facebook access token'
+        // return res.status(400).send({
+        //   error: 'invalid facebook access token'
+        // });
+
+        // this will happen if the fb access token stored in db is invalid
+        // return undefined for now
+        return res.send({
+          hashedId: user.hashedId,
+          firstName: user.firstName,
+          questions: questions,
+          bio: user.bio,
+          pictureThumb: user.pictureThumb,
+          pictureMed: user.pictureMed,
+          distance: req.matchingUser.dataValues.distance,
+          age: age,
+          mutualFriends: undefined
         });
       }
     });
