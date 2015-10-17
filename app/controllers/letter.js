@@ -143,7 +143,7 @@ exports.approveLetter = function(req, res) {
             user1: letterRecipient < letterSender ? letterRecipient : letterSender,
             user2: letterRecipient > letterSender ? letterRecipient : letterSender
           }).then(function(room) {
-            require('../sockets/notifier').notifyOfRoom(req.letter.UserAccountHashedId, room);
+            require('../sockets/notifier').notifyOfRoom(req.letter.UserAccountHashedId, room, req.user);
             return res.send(room);
           });
         } else {

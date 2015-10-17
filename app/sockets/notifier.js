@@ -24,9 +24,9 @@ exports.notifyOfLetter = function(recipient, letterHash) {
   });
 };
 
-exports.notifyOfRoom = function(letterSender, room) {
+exports.notifyOfRoom = function(letterSender, room, approver) {
   if (connectionsCounter.countUserConnections(letterSender)) {
-    io.to(letterSender).emit('roomCreated', room);
+    io.to(letterSender).emit('roomCreated', {room: room, approverName: approver.firstName});
   } else {
     // send notification
   }
