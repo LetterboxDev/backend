@@ -8,7 +8,15 @@ io.on('connection', function(socket) {
   socket.join(socket.decoded_token.hashedId);
   socket.on('roomMessage', function(data) {
     if (data.roomHash) {
-      db.Room.findOne({hash: data.roomHash}).then(function(room) {
+      db.Room.findOne({
+        where: {
+          hash: data.roomHash,
+          $or: [
+            {user1: socket.decoded_token.hashedId},
+            {user2: socket.decoded_token.hashedId}
+          ]
+        }
+      }).then(function(room) {
         var user1 = room.user1, user2 = room.user2;
         var sender = user1 === socket.decoded_token.hashedId ? user1 : user2;
         var recipient = user1 !== socket.decoded_token.hashedId ? user1 : user2;
