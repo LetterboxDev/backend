@@ -13,7 +13,30 @@ exports.getRooms = function(req, res) {
       ]
     }
   }).then(function(rooms) {
-    return res.status(200).send(rooms);
+    var users = [];
+    var plainRooms = [];
+    for (var i = 0; i < rooms.length; i++) {
+      var room = rooms[i].get({plain: true});
+      if (users.indexOf(room.user1) === -1) users.push(room.user1);
+      if (users.indexOf(room.user2) === -1) users.push(room.user2);
+      plainRooms.push(room);
+    }
+    db.UserAccount.findAll({where: {hashedId: {$in: users}}}).then(function(userAccounts) {
+      for (var i = 0; i < plainRooms.length; i++) {
+        var room = plainRooms[i];
+        var otherUser = room.user1 !== req.user.hashedId ? room.user1 : room.user2;
+        for (var j = 0; j < userAccounts.length; j++) {
+          if (userAccounts[j].hashedId === otherUser) {
+            room.userId = otherUser;
+            room.userName = userAccounts[j].firstName;
+            room.thumbnail = userAccounts[j].pictureThumb;
+            room.profilePicture = userAccounts[j].pictureMed;
+            break;
+          }
+        }
+      }
+      return res.status(200).send(plainRooms);
+    });
   });
 };
 
