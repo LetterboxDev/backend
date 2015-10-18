@@ -104,7 +104,7 @@ exports.validateFacebookToken = function(req, res, next) {
       return res.status(400).send({
         error: 'invalid facebook access token'
       });
-    }   
+    }
   });
 };
 
@@ -265,16 +265,25 @@ exports.sendMatch = function(req, res) {
       questions.push(user.UserWyrQuestions[i].WyrQuestion);
     }
     var age = (new Date()).getYear() - user.birthday.getYear();
-    return res.send({
-      hashedId: user.hashedId,
-      firstName: user.firstName,
-      questions: questions,
-      bio: user.bio,
-      pictureThumb: user.pictureThumb,
-      pictureMed: user.pictureMed,
-      distance: req.matchingUser.dataValues.distance,
-      age: age,
-      mutualFriends: []
+    graph.setAccessToken(req.user.accessToken);
+    graph.get('/' + user.profileId + '?fields=context.fields%28mutual_friends%29', function(err, fbResponse) {
+      if (!err && fbResponse) {
+        return res.send({
+          hashedId: user.hashedId,
+          firstName: user.firstName,
+          questions: questions,
+          bio: user.bio,
+          pictureThumb: user.pictureThumb,
+          pictureMed: user.pictureMed,
+          distance: req.matchingUser.dataValues.distance,
+          age: age,
+          mutualFriends: fbResponse.context.mutual_friends
+        });
+      } else {
+        return res.status(400).send({
+          error: 'invalid facebook access token'
+        });
+      }
     });
   });
 }
