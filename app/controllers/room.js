@@ -108,3 +108,24 @@ exports.getRoomMessages = function(req, res) {
     return res.send(messages);
   });
 };
+
+exports.getMessages = function(req, res) {
+  var whereClause = {
+    $or: [{
+      sender: req.user.hashedId
+    },{
+      recipient: req.user.hashedId
+    }]
+  };
+  if (req.query.since) {
+    whereClause.timeSent = {
+      $gt: req.query.since
+    };
+  }
+  db.Message.findAll({
+    where: whereClause,
+    order: [['timeSent', 'ASC']]
+  }).then(function(messages) {
+    return res.send(messages);
+  });
+};
