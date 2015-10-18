@@ -423,7 +423,9 @@ exports.updateGender = function(req, res) {
 exports.getSelf = function(req, res) {
   var questions = [];
   for (var i = 0; i < req.user.UserWyrQuestions.length; i++) {
-    questions.push(req.user.UserWyrQuestions[i].WyrQuestion);
+    var question = req.user.UserWyrQuestions[i].WyrQuestion.get({plain: true});
+    question.answer = req.user.UserWyrQuestions[i].answer;
+    questions.push(question);
   }
   var age = (new Date()).getYear() - req.user.birthday.getYear();
   return res.send({
