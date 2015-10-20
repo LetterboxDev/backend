@@ -482,6 +482,22 @@ exports.getOtherUser = function(req, res) {
   });
 };
 
+exports.setPushToken = function(req, res) {
+  if (typeof req.body.pushToken === 'string') {
+    req.user.update({
+      pushToken: req.body.pushToken
+    }).then(function(user) {
+      return res.send({
+        status: 'success'
+      });
+    });
+  } else {
+    return res.status(400).send({
+      error: 'invalid token'
+    });
+  }
+};
+
 function isFloat(n) {
   return n === Number(n) && n % 1 !== 0;
 }
