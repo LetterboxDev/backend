@@ -82,6 +82,6 @@ exports.notifyOfMessage = function(senderName, message) {
     io.to(message.recipient).emit('roomMessage', res);
   } else {
     // send notification of message from senderName
-    sendPushNotification(letterSender, senderName + ": " + message.content);
+    sendPushNotification(message.recipient, senderName + ": " + message.content);
   }
 };
