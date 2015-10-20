@@ -68,6 +68,10 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.BOOLEAN,
       allowNull: false,
       defaultValue: false
+    },
+    pushToken: {
+      type: DataTypes.STRING,
+      allowNull: true
     }
   }, {
     associate: function(models) {
