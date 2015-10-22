@@ -10,36 +10,40 @@ function sendPushNotification(hashedId, message) {
       hashedId: hashedId
     }
   }).then(function(user) {
-    logger.info('Sending push notification to ' + hashedId + ': ' + message);
-    var notification = {
-      'tokens': [user.pushToken],
-      'notification': {
-        'alert': message
-      }
-    };
-    var data = JSON.stringify(notification);
-    var secret = new Buffer(process.env.IONIC_PRIVATE_KEY).toString('base64').replace(/\n/g, '') + ':';
-    var options = {
-      hostname: 'push.ionic.io',
-      port: 443,
-      path: '/api/v1/push',
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Content-Length': data.length,
-        'X-Ionic-Application-Id': '64f32017',
-        'Authorization': 'Basic ' + secret
-      }
-    };
-    var post = https.request(options, function(res) {
-      res.setEncoding('utf8');
-      res.on('data', function (chunk) {
-        logger.info('Response: ' + chunk);
+    if (user.pushToken) {
+      logger.info('Sending push notification to ' + hashedId + ': ' + message);
+      var notification = {
+        'tokens': [user.pushToken],
+        'notification': {
+          'alert': message
+        }
+      };
+      var data = JSON.stringify(notification);
+      var secret = new Buffer(process.env.IONIC_PRIVATE_KEY).toString('base64').replace(/\n/g, '') + ':';
+      var options = {
+        hostname: 'push.ionic.io',
+        port: 443,
+        path: '/api/v1/push',
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Content-Length': data.length,
+          'X-Ionic-Application-Id': '64f32017',
+          'Authorization': 'Basic ' + secret
+        }
+      };
+      var post = https.request(options, function(res) {
+        res.setEncoding('utf8');
+        res.on('data', function (chunk) {
+          logger.info('Response: ' + chunk);
+        });
       });
-    });
 
-    post.write(data);
-    post.end();
+      post.write(data);
+      post.end();
+    } else {
+      logger.info('No push token set');
+    }
   });
 }
 
