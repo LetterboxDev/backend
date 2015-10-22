@@ -28,7 +28,7 @@ function sendPushNotification(hashedId, message) {
         headers: {
           'Content-Type': 'application/json',
           'Content-Length': data.length,
-          'X-Ionic-Application-Id': '64f32017',
+          'X-Ionic-Application-Id': process.env.IONIC_APP_ID,
           'Authorization': 'Basic ' + secret
         }
       };
