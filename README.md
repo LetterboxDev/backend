@@ -1,6 +1,6 @@
 #Letterbox Backend
 
-1. Set environment variables for `JWT_KEY`, `IONIC_PRIVATE_KEY`, `FACEBOOK_APP_ID` and `FACEBOOK_APP_SECRET`.
+1. Set environment variables for `JWT_KEY`, `IONIC_APP_ID`, `IONIC_PRIVATE_KEY`, `FACEBOOK_APP_ID` and `FACEBOOK_APP_SECRET`.
 
 2. Install and run mysql
 
