@@ -4,7 +4,7 @@ var connectionsCounter = require('./countconnections');
 var db = require('../../config/sequelize');
 var https = require('https');
 
-function sendPushNotification(hashedId, message) {
+function sendPushNotification(hashedId, message, type, id) {
   db.UserAccount.findOne({
     where: {
       hashedId: hashedId
@@ -12,10 +12,23 @@ function sendPushNotification(hashedId, message) {
   }).then(function(user) {
     if (user.pushToken) {
       logger.info('Sending push notification to ' + hashedId + ': ' + message);
+      var payload = {
+        '$state': type
+      };
+      if (type === 'app.chat') {
+        payload['$stateParams'] = "{\"chatId\": " + id + "}"
+      }
       var notification = {
         'tokens': [user.pushToken],
         'notification': {
-          'alert': message
+          'alert': message,
+          'ios': {
+            'priority': 10,
+            'payload': payload
+          },
+          'android': {
+            'payload': payload
+          }
         }
       };
       var data = JSON.stringify(notification);
@@ -65,7 +78,7 @@ exports.notifyOfLetter = function(recipient, letterHash) {
       io.to(recipient).emit('letter', letter);      
     } else {
       // send notifications
-      sendPushNotification(recipient, "You've received a letter!");
+      sendPushNotification(recipient, "You've received a letter!", 'app.notifications');
     }
   });
 };
@@ -75,7 +88,7 @@ exports.notifyOfRoom = function(letterSender, room, approver) {
     io.to(letterSender).emit('roomCreated', {room: room, approverName: approver.firstName});
   } else {
     // send notification
-    sendPushNotification(letterSender, approver.firstName + " just started a chat with you!");
+    sendPushNotification(letterSender, approver.firstName + " just started a chat with you!", 'app.chat', room.hash);
   }
 };
 
@@ -86,6 +99,6 @@ exports.notifyOfMessage = function(senderName, message) {
     io.to(message.recipient).emit('roomMessage', res);
   } else {
     // send notification of message from senderName
-    sendPushNotification(message.recipient, senderName + ": " + message.content);
+    sendPushNotification(message.recipient, senderName + ": " + message.content, 'app.chat', message.RoomHash);
   }
 };
