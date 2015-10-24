@@ -516,6 +516,90 @@ exports.setPushToken = function(req, res) {
   }
 };
 
+exports.getProfilePhotoAlbum = function(req, res, next) {
+  graph.setAccessToken(req.user.accessToken);
+  graph.get('/me/albums', function(err, fbResponse) {
+    if (!err && fbResponse.data) {
+      var albums = fbResponse.data;
+      for (var i = 0; i < albums.length; i++) {
+        var album = albums[i];
+        if (album.name === 'Profile Pictures') {
+          req.album = album;
+          return next();
+        }
+        return res.status(400).send({
+          error: 'unable to get Profile Pictures album'
+        });
+      }
+    } else {
+      return res.status(400).send({
+        error: 'unable to get albums'
+      });
+    }
+  });
+};
+
+exports.getProfilePhotos = function(req, res) {
+  var albumId = req.album.id;
+  graph.setAccessToken(req.user.accessToken);
+  graph.get(albumId + '/photos?fields=picture', function(err, fbResponse) {
+    if (!err && fbResponse.data) {
+      return res.send(fbResponse.data);
+    } else {
+      return res.status(400).send({
+        error: 'unable to get photos from album'
+      });
+    }
+  });
+};
+
+exports.checkPictureId = function(req, res, next) {
+  if (typeof req.body.id !== 'undefined') {
+    graph.setAccessToken(req.user.accessToken);
+    graph.get(req.body.id + '?fields=picture,from', function(err, fbResponse) {
+      if (!err && fbResponse && fbResponse.from.id === req.user.profileId) {
+        req.thumbnail = fbResponse.picture;
+        return next();
+      } else {
+        return res.status(400).send({
+          error: 'invalid picture id'
+        });
+      }
+    });
+  } else {
+    return res.status(400).send({
+      error: 'no picture id provided'
+    });
+  }
+};
+
+exports.getMediumPhoto = function(req, res, next) {
+  graph.setAccessToken(req.user.accessToken);
+  graph.get(req.body.id + '/picture', function(err, fbResponse) {
+    if (!err && fbResponse && fbResponse.data) {
+      req.medium = fbResponse.data.url;
+      return next();
+    } else {
+      return res.status(400).send({
+        error: 'unable to get medium sized picture'
+      });
+    }
+  });
+};
+
+exports.updateProfilePhoto = function(req, res) {
+  req.user.update({
+    pictureThumb: req.thumbnail,
+    pictureMed: req.medium
+  }).then(function(user) {
+    return res.send({
+      status: 'success',
+      pictureMed: user.pictureMed,
+      pictureThumb: user.pictureThumb
+    });
+  });
+};
+
 function isFloat(n) {
   return n === Number(n) && n % 1 !== 0;
 }

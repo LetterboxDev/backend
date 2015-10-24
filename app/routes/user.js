@@ -6,6 +6,8 @@ exports.init = function(app) {
 
   app.get('/user/self', userController.requireAuthentication, userController.getSelf);
   app.get('/user/id/:hashedId', userController.requireAuthentication, userController.getOtherUser);
+  app.get('/user/photo', userController.requireAuthentication, userController.getProfilePhotoAlbum, userController.getProfilePhotos);
+  app.put('/user/photo', userController.requireAuthentication, userController.checkPictureId, userController.getMediumPhoto, userController.updateProfilePhoto);
   app.put('/user/pushtoken', userController.requireAuthentication, userController.setPushToken);
   app.put('/user/location', userController.requireAuthentication, userController.updateLocation);
   app.put('/user/bio', userController.requireAuthentication, userController.updateBio);
