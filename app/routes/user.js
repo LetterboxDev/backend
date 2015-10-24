@@ -2,7 +2,7 @@ var userController = require('../controllers/user');
 
 exports.init = function(app) {
   app.get('/auth', userController.checkFacebookTokenParam, userController.validateFacebookToken, userController.getMediumProfilePicture, userController.extendFacebookToken, userController.storeUserData);
-  app.get('/auth/renew', userController.requireAuthentication, userController.setRenewVars, exports.extendFacebookToken, exports.validateFacebookToken, userController.renewToken);
+  app.get('/auth/renew', userController.requireAuthentication, userController.setRenewVars, userController.extendFacebookToken, userController.validateFacebookToken, userController.renewToken);
 
   app.get('/user/self', userController.requireAuthentication, userController.getSelf);
   app.get('/user/id/:hashedId', userController.requireAuthentication, userController.getOtherUser);
