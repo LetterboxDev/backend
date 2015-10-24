@@ -167,6 +167,7 @@ exports.storeUserData = function(req, res, next) {
         accessToken: req.fb_token
       });
       isRegistered = user.isRegistered;
+      genderPreference = user.genderPreference;
     }
     var encryptedToken = token.generateToken(hashedId);
     return res.status(200).send({
@@ -175,7 +176,8 @@ exports.storeUserData = function(req, res, next) {
       user: {
         hashedId: hashedId,
         firstName: req.firstName,
-        isRegistered: isRegistered
+        isRegistered: isRegistered,
+        genderPreference: genderPreference
       }
     });
   });
