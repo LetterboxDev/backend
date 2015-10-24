@@ -524,10 +524,11 @@ exports.getProfilePhotoAlbum = function(req, res, next) {
         if (album.name === 'Profile Pictures') {
           req.album = album;
           return next();
+        } else {
+          return res.status(400).send({
+            error: 'unable to get Profile Pictures album'
+          });
         }
-        return res.status(400).send({
-          error: 'unable to get Profile Pictures album'
-        });
       }
     } else {
       return res.status(400).send({
