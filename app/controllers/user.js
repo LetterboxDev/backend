@@ -185,7 +185,12 @@ exports.renewToken = function(req, res) {
   var encryptedToken = token.generateToken(req.user.hashedId);
   return res.status(200).send({
     status: 'success',
-    letterbox_token: encryptedToken
+    letterbox_token: encryptedToken,
+    user: {
+      hashedId: req.user.hashedId,
+      firstName: req.user.firstName,
+      isRegistered: req.user.isRegistered
+    }
   });
 };
 
