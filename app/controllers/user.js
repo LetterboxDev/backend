@@ -581,7 +581,9 @@ exports.getMediumPhoto = function(req, res, next) {
       return next();
     } else {
       return res.status(400).send({
-        error: 'unable to get medium sized picture'
+        error: 'unable to get medium sized picture',
+        fbErr: err,
+        fbResponse: fbResponse
       });
     }
   });
