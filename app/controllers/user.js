@@ -181,16 +181,29 @@ exports.storeUserData = function(req, res, next) {
   });
 };
 
+exports.setRenewVars = function(req, res, next) {
+  req.fb_token = req.user.accessToken;
+  next();
+};
+
 exports.renewToken = function(req, res) {
-  var encryptedToken = token.generateToken(req.user.hashedId);
-  return res.status(200).send({
-    status: 'success',
-    letterbox_token: encryptedToken,
-    user: {
-      hashedId: req.user.hashedId,
-      firstName: req.user.firstName,
-      isRegistered: req.user.isRegistered
-    }
+  req.user.update({
+    firstName: req.firstName,
+    lastName: req.lastName,
+    birthday: req.birthday,
+    gender: req.gender,
+    accessToken: req.fb_token
+  }).then(function(user) {
+    var encryptedToken = token.generateToken(req.user.hashedId);
+    return res.status(200).send({
+      status: 'success',
+      letterbox_token: encryptedToken,
+      user: {
+        hashedId: user.hashedId,
+        firstName: user.firstName,
+        isRegistered: user.isRegistered
+      }
+    });
   });
 };
 
