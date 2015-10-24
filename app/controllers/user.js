@@ -576,8 +576,8 @@ exports.checkPictureId = function(req, res, next) {
 exports.getMediumPhoto = function(req, res, next) {
   graph.setAccessToken(req.user.accessToken);
   graph.get(req.body.id + '/picture', function(err, fbResponse) {
-    if (!err && fbResponse && fbResponse.data) {
-      req.medium = fbResponse.data.url;
+    if (!err && fbResponse && fbResponse.location) {
+      req.medium = fbResponse.location;
       return next();
     } else {
       return res.status(400).send({
