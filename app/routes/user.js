@@ -11,7 +11,7 @@ exports.init = function(app) {
   app.put('/user/pushtoken', userController.requireAuthentication, userController.setPushToken);
   app.put('/user/location', userController.requireAuthentication, userController.updateLocation);
   app.put('/user/bio', userController.requireAuthentication, userController.updateBio);
-  app.put('/user/gender', userController.requireAuthentication, userController.updateGender);
+  app.put('/user/genderPreference', userController.requireAuthentication, userController.updateGenderPreference);
 
   app.get('/match', userController.requireAuthentication, userController.getMatch, userController.sendMatch);
   app.get('/matches', userController.requireAuthentication, userController.getMultipleMatches, userController.sendMultipleMatches);

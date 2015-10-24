@@ -440,14 +440,12 @@ exports.updateBio = function(req, res) {
   }
 };
 
-exports.updateGender = function(req, res) {
+exports.updateGenderPreference = function(req, res) {
   var validGenders = ['male', 'female'];
-  var gender = req.body.gender;
   var genderPreference = req.body.genderPreference;
 
-  if (validGenders.indexOf(gender) > -1 && validGenders.indexOf(genderPreference) > -1) {
+  if (validGenders.indexOf(genderPreference) > -1) {
     req.user.update({
-      gender: gender,
       genderPreference: genderPreference
     }).then(function(user) {
       return res.send({
