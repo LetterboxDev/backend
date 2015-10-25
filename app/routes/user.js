@@ -9,6 +9,7 @@ exports.init = function(app) {
   app.get('/user/photo', userController.requireAuthentication, userController.getProfilePhotoAlbum, userController.getProfilePhotos);
   app.put('/user/photo', userController.requireAuthentication, userController.checkPictureId, userController.getMediumPhoto, userController.updateProfilePhoto);
   app.put('/user/pushtoken', userController.requireAuthentication, userController.setPushToken);
+  app.delete('/user/pushtoken', userController.requireAuthentication, userController.clearPushToken);
   app.put('/user/location', userController.requireAuthentication, userController.updateLocation);
   app.put('/user/bio', userController.requireAuthentication, userController.updateBio);
   app.put('/user/genderPreference', userController.requireAuthentication, userController.updateGenderPreference);

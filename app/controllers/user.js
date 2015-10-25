@@ -516,6 +516,16 @@ exports.setPushToken = function(req, res) {
   }
 };
 
+exports.clearPushToken = function(req, res) {
+  req.user.update({
+    pushToken: null
+  }).then(function(user) {
+    return res.send({
+      status: 'success'
+    });
+  });
+};
+
 exports.getProfilePhotoAlbum = function(req, res, next) {
   graph.setAccessToken(req.user.accessToken);
   graph.get('/me/albums', function(err, fbResponse) {
