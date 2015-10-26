@@ -204,7 +204,7 @@ exports.renewToken = function(req, res) {
         hashedId: user.hashedId,
         firstName: user.firstName,
         isRegistered: user.isRegistered,
-        genderPreference: genderPreference
+        genderPreference: user.genderPreference
       }
     });
   });
