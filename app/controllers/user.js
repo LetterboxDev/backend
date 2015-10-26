@@ -233,9 +233,35 @@ exports.getUser = function(req, res, next, hashedId) {
   });
 };
 
+function getMinBirthday(maxAge) {
+  var minBirthday = new Date();
+  minBirthday.setYear((new Date()).getYear() - maxAge);
+  minBirthday.setMonth(0);
+  minBirthday.setDate(1);
+  minBirthday.setHours(0);
+  minBirthday.setMinutes(0);
+  minBirthday.setSeconds(0);
+  minBirthday.setMilliseconds(0);
+  return minBirthday;
+}
+
+function getMaxBirthday(minAge) {
+  var maxBirthday = new Date();
+  maxBirthday.setYear((new Date()).getYear() - minAge);
+  maxBirthday.setMonth(11);
+  maxBirthday.setDate(31);
+  maxBirthday.setHours(23);
+  maxBirthday.setMinutes(59);
+  maxBirthday.setSeconds(59);
+  maxBirthday.setMilliseconds(999);
+  return maxBirthday;
+}
+
 exports.getMatch = function(req, res, next) {
   var maxDistance = Number(req.query.maxDistance);
   var previousId = req.query.previousId;
+  var maxBirthday = getMaxBirthday(req.query.minAge ? req.query.minAge : 18);
+  var minBirthday = getMinBirthday(req.query.maxAge ? req.query.maxAge : 80);
   var hashedIdCheck = getHashedIdCheckClause(req.user.hashedId, previousId);
   if (maxDistance > 0) {
     var myLat = req.user.latitude;
@@ -244,6 +270,12 @@ exports.getMatch = function(req, res, next) {
     db.UserAccount.findOne({
       attributes: getDistanceMatchAttributes(myLat, myLon),
       where: {
+        birthday: {
+          $and: [
+            {$gt: minBirthday},
+            {$lt: maxBirthday}
+          ]
+        },
         hashedId: hashedIdCheck,
         gender: req.user.genderPreference,
         genderPreference: req.user.gender,
