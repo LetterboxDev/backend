@@ -185,7 +185,7 @@ exports.storeUserData = function(req, res, next) {
 
 exports.setRenewVars = function(req, res, next) {
   req.fb_token = req.user.accessToken;
-  next();
+  return next();
 };
 
 exports.renewToken = function(req, res) {
@@ -203,7 +203,8 @@ exports.renewToken = function(req, res) {
       user: {
         hashedId: user.hashedId,
         firstName: user.firstName,
-        isRegistered: user.isRegistered
+        isRegistered: user.isRegistered,
+        genderPreference: genderPreference
       }
     });
   });
