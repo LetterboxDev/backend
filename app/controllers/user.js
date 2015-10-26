@@ -256,8 +256,9 @@ exports.getMatch = function(req, res, next) {
         req.matchingUser = user;
         return next();
       } else {
-        return res.status(400).send({
-          error: 'no match found'
+        return res.send({
+          code: 100,
+          status: 'no match found'
         });
       }
     });
@@ -289,6 +290,8 @@ exports.sendMatch = function(req, res) {
     graph.get('/' + user.profileId + '?fields=context.fields%28mutual_friends%29', function(err, fbResponse) {
       if (!err && fbResponse) {
         return res.send({
+          code: 200,
+          status: 'match found',
           hashedId: user.hashedId,
           firstName: user.firstName,
           questions: questions,
@@ -300,13 +303,9 @@ exports.sendMatch = function(req, res) {
           mutualFriends: fbResponse.context.mutual_friends
         });
       } else {
-        // return res.status(400).send({
-        //   error: 'invalid facebook access token'
-        // });
-
-        // this will happen if the fb access token stored in db is invalid
-        // return undefined for now
         return res.send({
+          code: 200,
+          status: 'match found',
           hashedId: user.hashedId,
           firstName: user.firstName,
           questions: questions,
