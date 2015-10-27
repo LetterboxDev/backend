@@ -664,7 +664,7 @@ exports.updateProfilePhoto = function(req, res) {
 };
 
 exports.setPerfectMatch = function(req, res) {
-  if (req.body.perfectMatch) {
+  if (typeof req.body.perfectMatch !== 'undefined') {
     req.user.update({
       perfectMatch: req.body.perfectMatch
     }).then(function(user) {
