@@ -170,7 +170,8 @@ exports.storeUserData = function(req, res, next) {
             hashedId: hashedId,
             firstName: user.firstName,
             isRegistered: user.isRegistered,
-            genderPreference: user.genderPreference
+            genderPreference: user.genderPreference,
+            perfectMatch: user.perfectMatch
           }
         });
       });
@@ -190,7 +191,8 @@ exports.storeUserData = function(req, res, next) {
             hashedId: hashedId,
             firstName: user.firstName,
             isRegistered: user.isRegistered,
-            genderPreference: user.genderPreference
+            genderPreference: user.genderPreference,
+            perfectMatch: user.perfectMatch
           }
         });
       });
@@ -219,7 +221,8 @@ exports.renewToken = function(req, res) {
         hashedId: user.hashedId,
         firstName: user.firstName,
         isRegistered: user.isRegistered,
-        genderPreference: user.genderPreference
+        genderPreference: user.genderPreference,
+        perfectMatch: user.perfectMatch
       }
     });
   });
@@ -524,7 +527,8 @@ exports.getSelf = function(req, res) {
     age: age,
     questions: questions,
     pictureThumb: req.user.pictureThumb,
-    pictureMed: req.user.pictureMed
+    pictureMed: req.user.pictureMed,
+    perfectMatch: req.user.perfectMatch
   });
 };
 
@@ -657,6 +661,23 @@ exports.updateProfilePhoto = function(req, res) {
       pictureThumb: user.pictureThumb
     });
   });
+};
+
+exports.setPerfectMatch = function(req, res) {
+  if (req.body.perfectMatch) {
+    req.user.update({
+      perfectMatch: req.body.perfectMatch
+    }).then(function(user) {
+      return res.send({
+        status: 'success',
+        perfectMatch: user.perfectMatch
+      });
+    });
+  } else {
+    return res.status(400).send({
+      error: 'invalid request body'
+    });
+  }
 };
 
 function isFloat(n) {

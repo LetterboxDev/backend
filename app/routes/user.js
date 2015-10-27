@@ -8,6 +8,7 @@ exports.init = function(app) {
   app.get('/user/id/:hashedId', userController.requireAuthentication, userController.getOtherUser);
   app.get('/user/photo', userController.requireAuthentication, userController.getProfilePhotoAlbum, userController.getProfilePhotos);
   app.put('/user/photo', userController.requireAuthentication, userController.checkPictureId, userController.getMediumPhoto, userController.updateProfilePhoto);
+  app.put('/user/perfectmatch', userController.requireAuthentication, userController.setPerfectMatch);
   app.put('/user/pushtoken', userController.requireAuthentication, userController.setPushToken);
   app.delete('/user/pushtoken', userController.requireAuthentication, userController.clearPushToken);
   app.put('/user/location', userController.requireAuthentication, userController.updateLocation);

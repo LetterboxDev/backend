@@ -72,6 +72,11 @@ module.exports = function(sequelize, DataTypes) {
     pushToken: {
       type: DataTypes.STRING,
       allowNull: true
+    },
+    perfectMatch: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+      allowNull: false
     }
   }, {
     associate: function(models) {
