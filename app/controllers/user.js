@@ -299,8 +299,8 @@ exports.getMatch = function(req, res, next) {
         genderPreference: req.user.gender,
         isRegistered: true,
         $and: [
-          ['`hashedId` NOT IN (SELECT `recipient` FROM `Letters` WHERE `UserAccountHashedId`=?', req.user.hashedId],
-          ['`hashedId` NOT IN (SELECT `UserAccountHashedId` FROM `Letters` WHERE `recipient`=?', req.user.hashedId]
+          ['`hashedId` NOT IN (SELECT `recipient` FROM `Letters` WHERE `UserAccountHashedId`=?)', req.user.hashedId],
+          ['`hashedId` NOT IN (SELECT `UserAccountHashedId` FROM `Letters` WHERE `recipient`=?)', req.user.hashedId]
         ]
       },
       having: ['distance <= ?', maxDistance],
