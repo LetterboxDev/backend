@@ -65,7 +65,7 @@ var createAnswersRecursively = function(letterHash, questions, index, promise) {
   }
 };
 
-exports.createLetter = function(req, res) {
+exports.createLetter = function(req, res, next) {
   var questions = req.body.questions;
   if (questions instanceof Array && questions.length === 5) {
     db.Letter.create({
@@ -75,10 +75,7 @@ exports.createLetter = function(req, res) {
     }).then(function(letter) {
       req.letter = letter;
       createAnswersRecursively(req.letterHash, questions, 0, function() {
-        require('../sockets/notifier').notifyOfLetter(req.recipient.hashedId, req.letterHash);
-        return res.send({
-          status: 'success'
-        });
+        
       });
     });
   } else {
@@ -86,6 +83,39 @@ exports.createLetter = function(req, res) {
       error: 'invalid questions length'
     });
   }
+};
+
+exports.checkPerfectMatch = function(req, res, next) {
+  if (!req.recipient.perfectMatch) {
+    var recipientQuestions = req.recipient.UserWyrQuestions;
+    var replyAnswers = req.body.questions;
+    for (var i = 0; i < recipientQuestions.length; i++) {
+      var question = recipientQuestions[i];
+      for (var j = 0; j < replyAnswers.length; j++) {
+        var replyAnswer = replyAnswers[i];
+        if (question.WyrQuestionId === replyAnswer.id) {
+          if (question.answer !== replyAnswer.answer) {
+            req.isPerfectMatch = false;
+            return next();
+          }
+          break;
+        }
+      }
+    }
+    req.isPerfectMatch = true;
+  }
+  return next();
+};
+
+exports.sendLetter = function(req, res) {
+  if (!req.recipient.perfectMatch || req.isPerfectMatch) {
+    require('../sockets/notifier').notifyOfLetter(req.recipient.hashedId, req.letterHash);
+  } else {
+    letter.update({isRead: true, isRejected: true});
+  }
+  return res.send({
+    status: 'success'
+  });
 };
 
 exports.checkLetterHashExists = function(req, res, next) {
@@ -110,7 +140,8 @@ exports.getRecipient = function(req, res, next) {
   db.UserAccount.findOne({
     where: {
       hashedId: req.body.recipient
-    }
+    },
+    include: [{model: db.UserWyrQuestion}]
   }).then(function(user) {
     if (user && user.hashedId !== req.user.hashedId) {
       req.recipient = user;
