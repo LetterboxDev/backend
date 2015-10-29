@@ -155,7 +155,7 @@ exports.getRecipient = function(req, res, next) {
 };
 
 exports.approveLetter = function(req, res) {
-  if (req.letter.recipient === req.user.hashedId) {
+  if (req.letter.recipient === req.user.hashedId && !req.letter.isApproved && !req.letter.isRejected) {
     req.letter.update({
       isRead: true,
       isApproved: true
@@ -193,7 +193,7 @@ exports.approveLetter = function(req, res) {
 };
 
 exports.rejectLetter = function(req, res) {
-  if (req.letter.recipient === req.user.hashedId) {
+  if (req.letter.recipient === req.user.hashedId && !req.letter.isApproved && !req.letter.isRejected) {
     req.letter.update({
       isRead: true,
       isRejected: true
@@ -201,6 +201,10 @@ exports.rejectLetter = function(req, res) {
       return res.send({
         status: 'success'
       });
+    });
+  } else {
+    return res.status(401).send({
+      error: 'unauthorized'
     });
   }
 };
