@@ -75,7 +75,7 @@ exports.createLetter = function(req, res, next) {
     }).then(function(letter) {
       req.letter = letter;
       createAnswersRecursively(req.letterHash, questions, 0, function() {
-        
+        next();
       });
     });
   } else {
