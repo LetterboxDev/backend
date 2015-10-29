@@ -111,7 +111,7 @@ exports.sendLetter = function(req, res) {
   if (!req.recipient.perfectMatch || req.isPerfectMatch) {
     require('../sockets/notifier').notifyOfLetter(req.recipient.hashedId, req.letterHash);
   } else {
-    letter.update({isRead: true, isRejected: true});
+    req.letter.update({isRead: true, isRejected: true});
   }
   return res.send({
     status: 'success'
