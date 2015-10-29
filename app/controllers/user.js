@@ -298,10 +298,7 @@ exports.getMatch = function(req, res, next) {
         gender: req.user.genderPreference,
         genderPreference: req.user.gender,
         isRegistered: true,
-        $and: [
-          ['`hashedId` NOT IN (SELECT `recipient` FROM `Letters` WHERE `UserAccountHashedId`=?', req.user.hashedId],
-          ['`hashedId` NOT IN (SELECT `UserAccountHashedId` FROM `Letters` WHERE `recipient`=?', req.user.hashedId]
-        ]
+        $and: [['`hashedId` NOT IN (SELECT `recipient` FROM `Letters` WHERE `UserAccountHashedId`=? AND (`createdAt`>? OR `isApproved`=1 OR `isRejected`=1))', req.user.hashedId, oneMonthAgo]]
       },
       having: ['distance <= ?', maxDistance],
       order: [db.Sequelize.fn('RAND')]
