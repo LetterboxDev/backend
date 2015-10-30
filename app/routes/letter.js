@@ -3,6 +3,7 @@ var letterController = require('../controllers/letter');
 
 exports.init = function(app) {
   app.get('/letters', userController.requireAuthentication, letterController.getLetters);
+  app.get('/letters/all', userController.requireAuthentication, letterController.getAllLetters);
   app.get('/letters/sender/:userHash', userController.requireAuthentication, letterController.getLetterFromSender);
   app.post('/letters', userController.requireAuthentication, letterController.getRecipient, letterController.checkLetterHashExists, letterController.createLetter, letterController.checkPerfectMatch, letterController.sendLetter);
   app.post('/letters/:letterHash', userController.requireAuthentication, letterController.approveLetter);

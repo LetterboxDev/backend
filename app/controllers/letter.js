@@ -37,6 +37,25 @@ exports.getLetters = function(req, res) {
   })
 };
 
+// Get all letters sent to the user, regardless of whether it's approved/rejected or not
+exports.getAllLetters = function(req, res) {
+  db.Letter.findAll({
+    where: {
+      recipient: req.user.hashedId
+    },
+    include: [{
+      model: db.LetterAnswer,
+      include: db.WyrQuestion
+    },{
+      model: db.UserAccount,
+      attributes: ['firstName', 'gender', 'birthday', 'bio', 'pictureThumb', 'pictureMed']
+    }],
+    order: [['createdAt', 'DESC']]
+  }).then(function(letters) {
+    return res.send(letters);
+  })
+};
+
 // Get letter sent from a specific user to the user
 exports.getLetterFromSender = function(req, res, userHash) {
   db.Letter.findAll({
