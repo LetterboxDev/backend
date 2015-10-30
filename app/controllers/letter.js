@@ -37,6 +37,26 @@ exports.getLetters = function(req, res) {
   })
 };
 
+// Get letter sent from a specific user to the user
+exports.getLetterFromSender = function(req, res, userHash) {
+  db.Letter.findAll({
+    where: {
+      recipient: req.user.hashedId,
+      UserAccountHashedId: req.otherUser.hashedId
+    },
+    include: [{
+      model: db.LetterAnswer,
+      include: db.WyrQuestion
+    },{
+      model: db.UserAccount,
+      attributes: ['firstName', 'gender', 'birthday', 'bio', 'pictureThumb', 'pictureMed']
+    }],
+    order: [['createdAt', 'DESC']]
+  }).then(function(letters) {
+    return res.send(letters);
+  })
+};
+
 /**
  * Request body:
  * {
