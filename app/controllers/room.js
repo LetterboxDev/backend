@@ -11,7 +11,10 @@ exports.getRooms = function(req, res) {
         {user1: req.user.hashedId},
         {user2: req.user.hashedId}
       ]
-    }
+    },
+    include: [{
+      model: db.Letter
+    }]
   }).then(function(rooms) {
     var users = [];
     var plainRooms = [];
@@ -78,7 +81,10 @@ exports.getRoom = function(req, res, next, roomId) {
       $or: [
         {user1: req.user.hashedId},
         {user2: req.user.hashedId}
-      ]
+      ],
+      include: [{
+        model: db.Letter
+      }]
     }
   }).then(function(room) {
     if (room) {
