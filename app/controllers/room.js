@@ -58,7 +58,7 @@ exports.getSingleRoom = function(req, res) {
     }).then(function(latestMessage) {
       var room = {};
       room.hash = req.room.hash;
-      room.letter = req.room.Letter;
+      room.letter = req.letter;
       room.userId = user.hashedId;
       room.userName = user.firstName;
       room.thumbnail = user.pictureThumb;
@@ -89,11 +89,26 @@ exports.getRoom = function(req, res, next, roomId) {
       include: [{
         model: db.LetterAnswer,
         include: db.WyrQuestion
+      },{
+        model: db.UserAccount
       }]
     }]
   }).then(function(room) {
     if (room) {
       req.room = room;
+      req.letter = {
+        senderId: room.Letter.UserAccount.hashedId,
+        senderName: room.Letter.UserAccount.firstName,
+        questions: []
+      };
+      for (var i = 0; i < room.Letter.LetterAnswers.length; i++) {
+        var letterAnswer = room.Letter.LetterAnswers[i];
+        req.letter.questions.push({
+          option0: letterAnswer.WyrQuestion.option0,
+          option1: letterAnswer.WyrQuestion.option1,
+          answer: letterAnswer.answer
+        });
+      }
       return next();
     } else {
       return res.status(404).send({
