@@ -81,11 +81,11 @@ exports.getRoom = function(req, res, next, roomId) {
       $or: [
         {user1: req.user.hashedId},
         {user2: req.user.hashedId}
-      ],
-      include: [{
-        model: db.Letter
-      }]
-    }
+      ]
+    },
+    include: [{
+      model: db.Letter
+    }]
   }).then(function(room) {
     if (room) {
       req.room = room;
