@@ -85,7 +85,11 @@ exports.getRoom = function(req, res, next, roomId) {
       ]
     },
     include: [{
-      model: db.Letter
+      model: db.Letter,
+      include: [{
+        model: db.LetterAnswers,
+        include: db.WyrQuestion
+      }]
     }]
   }).then(function(room) {
     if (room) {
