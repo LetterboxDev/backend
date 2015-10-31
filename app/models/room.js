@@ -45,6 +45,7 @@ module.exports = function(sequelize, DataTypes) {
     },
     associate: function(models) {
       Room.hasMany(models.Message);
+      Room.belongsTo(models.Letter);
     },
     timestamps: true, // sets createdAt and updatedAt
     paranoid: false, // disables soft deletion
