@@ -172,7 +172,8 @@ exports.approveLetter = function(req, res) {
           db.Room.create({
             hash: roomHash,
             user1: letterRecipient < letterSender ? letterRecipient : letterSender,
-            user2: letterRecipient > letterSender ? letterRecipient : letterSender
+            user2: letterRecipient > letterSender ? letterRecipient : letterSender,
+            LetterHash: letter.hash
           }).then(function(room) {
             require('../sockets/notifier').notifyOfRoom(req.letter.UserAccountHashedId, room, req.user);
             return res.send(room);
