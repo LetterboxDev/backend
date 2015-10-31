@@ -87,7 +87,7 @@ exports.getRoom = function(req, res, next, roomId) {
     include: [{
       model: db.Letter,
       include: [{
-        model: db.LetterAnswers,
+        model: db.LetterAnswer,
         include: db.WyrQuestion
       }]
     }]
