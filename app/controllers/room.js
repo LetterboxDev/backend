@@ -58,6 +58,7 @@ exports.getSingleRoom = function(req, res) {
     }).then(function(latestMessage) {
       var room = {};
       room.hash = req.room.hash;
+      room.letter = req.room.Letter;
       room.userId = user.hashedId;
       room.userName = user.firstName;
       room.thumbnail = user.pictureThumb;
