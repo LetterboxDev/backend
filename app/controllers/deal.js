@@ -120,7 +120,7 @@ exports.getLikedDeals = function(req, res) {
       },
       include: [{
         model: db.Deal
-      }]
+      }],
       order: [['createdAt', 'DESC']]
     }).then(function(likes) {
       var result = [];
