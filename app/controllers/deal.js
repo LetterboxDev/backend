@@ -37,6 +37,23 @@ exports.getDealById = function(req, res, next, dealId) {
   });
 };
 
+exports.getOtherUserById = function(req, res, next, otherUserId) {
+  if (otherUserId === 'self') {
+    req.otherUser = 'self';
+    return next();
+  }
+  db.UserAccount.findOne({
+    where: {
+      hashedId: otherUserId
+    }
+  }).then(function(user) {
+    if (user) {
+      req.otherUser = user;
+    }
+    return next();
+  });
+};
+
 exports.getCategories = function(req, res) {
   db.DealCategory.findAll({
     order: [['title', 'ASC']]
@@ -90,4 +107,57 @@ exports.likeDeal = function(req, res) {
       });
     }
   });
+};
+
+exports.getLikedDeals = function(req, res) {
+  if (req.otherUser) {
+    if (req.otherUser === 'self') {
+      req.otherUser = req.user;
+    }
+    db.DealLike.findAll({
+      where: {
+        UserAccountHashedId: req.otherUser.hashedId
+      },
+      include: [{
+        model: db.Deal
+      }]
+      order: [['createdAt', 'DESC']]
+    }).then(function(likes) {
+      var result = [];
+      for (var i = 0; i < likes.length; i++) {
+        var deal = likes[i].get({plain: true}).Deal;
+        result.push(deal);
+      }
+      return res.send(result);
+    })
+  } else {
+    return res.status(404).send({
+      error: 'user not found'
+    });
+  }
+};
+
+exports.getMutualLikedDeals = function(req, res) {
+  if (req.otherUser) {
+    if (req.otherUser === 'self' || req.otherUser.hashedId === req.user.hashedId) {
+      return res.status(400).send({
+        error: 'cannot get mutal likes with self'
+      });
+    }
+    db.Deal.findAll({
+      where: {
+        $and: [
+          ['`id` IN (SELECT `DealId` FROM DealLike WHERE `UserAccountHashedId`=?)', req.user.hashedId],
+          ['`id` IN (SELECT `DealId` FROM DealLike WHERE `UserAccountHashedId`=?)', req.otherUser.hashedId]
+        ]
+      },
+      order: [['createdAt', 'DESC']]
+    }).then(function(deals) {
+      return res.send(deals);
+    });
+  } else {
+    return res.status(404).send({
+      error: 'user not found'
+    });
+  }
 };
