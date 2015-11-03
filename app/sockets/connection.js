@@ -3,6 +3,24 @@ var io = require('../../config/socketio');
 var logger = require('../../config/logger');
 var connectionsCounter = require('./countconnections');
 
+function createMessage(sender, recipient, type, content, RoomHash, deal) {
+  db.UserAccount.findOne({where: {hashedId: sender}}).then(function(user) {
+    db.Message.create({
+      sender: sender,
+      recipient: recipient,
+      type: type,
+      content: content,
+      timeSent: Date.now(),
+      RoomHash: RoomHash,
+      DealId: deal ? deal.id : null
+    }).then(function(message) {
+      message = message.get({plain: true});
+      message.Deal = deal;
+      require('./notifier').notifyOfMessage(user.firstName, message);
+    });
+  });
+}
+
 io.on('connection', function(socket) {
   logger.info('connection established with: ' + socket.decoded_token.hashedId);
   socket.join(socket.decoded_token.hashedId);
@@ -20,17 +38,19 @@ io.on('connection', function(socket) {
         var user1 = room.user1, user2 = room.user2;
         var sender = user1 === socket.decoded_token.hashedId ? user1 : user2;
         var recipient = user1 !== socket.decoded_token.hashedId ? user1 : user2;
-        db.UserAccount.findOne({where: {hashedId: sender}}).then(function(user) {
-          db.Message.create({
-            sender: sender,
-            recipient: recipient,
-            content: data.message,
-            timeSent: Date.now(),
-            RoomHash: data.roomHash
-          }).then(function(message) {
-            require('./notifier').notifyOfMessage(user.firstName, message);
+        if (data.type === 'share') {
+          db.Deal.findOne({
+            where: {
+              id: data.dealId
+            }
+          }).then(function(deal) {
+            if (deal) {
+              createMessage(sender, recipient, 'share', data.message, data.roomHash, deal);
+            }
           });
-        });
+        } else {
+          createMessage(sender, recipient, 'message', data.message, data.roomHash);
+        }
       });
     }
   });
