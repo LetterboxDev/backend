@@ -22,9 +22,11 @@ exports.getDealCategory = function(req, res, next, dealCat) {
 
 exports.getDealById = function(req, res, next, dealId) {
   db.Deal.findOne({
+    attributes: ['Deals.*', [db.sequelize.fn('COUNT', '*'), 'likeCount']],
     where: {
       id: dealId
-    }
+    },
+    include: [db.DealLike]
   }).then(function(deal) {
     if (deal) {
       req.deal = deal;
@@ -76,11 +78,17 @@ exports.getDeals = function(req, res) {
     whereClause.$and = [['`id` NOT IN (SELECT `DealId` FROM `DealLike` WHERE `UserAccountHashedId`=?)', req.user.hashedId]];
   }
   db.Deal.findAll({
+    attributes: ['Deals.*', [db.sequelize.fn('COUNT', '*'), 'likeCount']],
     where: whereClause,
-    order: [['createdAt', 'DESC']]
+    order: [['createdAt', 'DESC']],
+    include: [db.DealLike]
   }).then(function(deals) {
     return res.send(deals);
   });
+};
+
+exports.getDeal = function(req, res) {
+  return res.send(req.deal);
 };
 
 exports.likeDeal = function(req, res) {
