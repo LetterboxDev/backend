@@ -22,7 +22,6 @@ exports.getDealCategory = function(req, res, next, dealCat) {
 
 exports.getDealById = function(req, res, next, dealId) {
   db.Deal.findOne({
-    attributes: ['Deals.*', [db.sequelize.fn('COUNT', '*'), 'likeCount']],
     where: {
       id: dealId
     },
@@ -66,8 +65,8 @@ exports.getCategories = function(req, res) {
 
 exports.getDeals = function(req, res) {
   var whereClause = {};
-  if (category.title !== 'all') {
-    whereClause.DealCategoryTitle = category.title;
+  if (req.category.title !== 'all') {
+    whereClause.DealCategoryTitle = req.category.title;
   }
   if (req.query.removeExpired) {
     whereClause.expiry = {
@@ -78,12 +77,25 @@ exports.getDeals = function(req, res) {
     whereClause.$and = [['`id` NOT IN (SELECT `DealId` FROM `DealLike` WHERE `UserAccountHashedId`=?)', req.user.hashedId]];
   }
   db.Deal.findAll({
-    attributes: ['Deals.*', [db.sequelize.fn('COUNT', '*'), 'likeCount']],
     where: whereClause,
     order: [['createdAt', 'DESC']],
     include: [db.DealLike]
   }).then(function(deals) {
-    return res.send(deals);
+    var result = [];
+    for (var i = 0; i < deals.length; i++) {
+      var deal = deals[i].get({plain: true});
+      deal.likeCount = deal.DealLikes.length;
+      for (var j = 0; j < deal.likeCount; j++) {
+        if (deal.DealLikes[j].UserAccountHashedId === req.user.hashedId) {
+          deal.isLiked = true;
+          break;
+        }
+      }
+      if (!deal.isLiked) deal.isLiked = false;
+      delete deal.DealLikes;
+      result.push(deal);
+    }
+    return res.send(result);
   });
 };
 
