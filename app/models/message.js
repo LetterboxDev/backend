@@ -1,4 +1,4 @@
-// Message Buffer schema
+// Message schema
 module.exports = function(sequelize, DataTypes) {
   var Message = sequelize.define('Message', {
     sender: {
@@ -17,6 +17,12 @@ module.exports = function(sequelize, DataTypes) {
         key: 'hashedId'
       }
     },
+    type: {
+      type: DataTypes.STRING,
+      isIn: [['message', 'share']],
+      allowNull: false,
+      defaultValue: 'message'
+    },
     content: {
       type: DataTypes.TEXT,
       allowNull: false
@@ -31,6 +37,9 @@ module.exports = function(sequelize, DataTypes) {
       defaultValue: false
     }
   }, {
+    associate: function(models) {
+      Message.belongsTo(models.Deal);
+    },
     timestamps: false, // sets createdAt and updatedAt
     paranoid: false, // disables soft deletion
   });
