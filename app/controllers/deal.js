@@ -3,21 +3,39 @@
  */
 var db = require('../../config/sequelize');
 
+function formatDeal(plainDeal, hashedId) {
+  plainDeal.likeCount = plainDeal.DealLikes.length;
+  for (var j = 0; j < plainDeal.likeCount; j++) {
+    if (plainDeal.DealLikes[j].UserAccountHashedId === hashedId) {
+      plainDeal.isLiked = true;
+      break;
+    }
+  }
+  if (!plainDeal.isLiked) plainDeal.isLiked = false;
+  delete plainDeal.DealLikes;
+  return plainDeal;
+}
+
 exports.getDealCategory = function(req, res, next, dealCat) {
-  db.DealCategory.findOne({
-    where: {
-      title: dealCat
-    }
-  }).then(function(category) {
-    if (category) {
-      req.category = category;
-      return next();
-    } else {
-      return res.status(404).send({
-        error: 'category ' + dealCat + ' not found'
-      });
-    }
-  });
+  if (dealCat === 'all') {
+    req.category = 'all';
+    return next();
+  } else {
+    db.DealCategory.findOne({
+      where: {
+        title: dealCat
+      }
+    }).then(function(category) {
+      if (category) {
+        req.category = category;
+        return next();
+      } else {
+        return res.status(404).send({
+          error: 'category ' + dealCat + ' not found'
+        });
+      }
+    });
+  }
 };
 
 exports.getDealById = function(req, res, next, dealId) {
@@ -29,17 +47,8 @@ exports.getDealById = function(req, res, next, dealId) {
   }).then(function(deal) {
     if (deal) {
       var plainDeal = deal.get({plain: true});
-      plainDeal.likeCount = plainDeal.DealLikes.length;
-      for (var j = 0; j < plainDeal.likeCount; j++) {
-        if (plainDeal.DealLikes[j].UserAccountHashedId === req.user.hashedId) {
-          plainDeal.isLiked = true;
-          break;
-        }
-      }
-      if (!plainDeal.isLiked) plainDeal.isLiked = false;
-      delete plainDeal.DealLikes;
+      req.plainDeal = formatDeal(plainDeal, req.user.hashedId);      
       req.deal = deal;
-      req.plainDeal = plainDeal;
       return next();
     } else {
       return res.status(404).send({
@@ -76,7 +85,7 @@ exports.getCategories = function(req, res) {
 
 exports.getDeals = function(req, res) {
   var whereClause = {};
-  if (req.category.title !== 'all') {
+  if (req.category !== 'all') {
     whereClause.DealCategoryTitle = req.category.title;
   }
   if (req.query.removeExpired) {
@@ -94,16 +103,7 @@ exports.getDeals = function(req, res) {
   }).then(function(deals) {
     var result = [];
     for (var i = 0; i < deals.length; i++) {
-      var deal = deals[i].get({plain: true});
-      deal.likeCount = deal.DealLikes.length;
-      for (var j = 0; j < deal.likeCount; j++) {
-        if (deal.DealLikes[j].UserAccountHashedId === req.user.hashedId) {
-          deal.isLiked = true;
-          break;
-        }
-      }
-      if (!deal.isLiked) deal.isLiked = false;
-      delete deal.DealLikes;
+      var deal = formatDeal(deals[i].get({plain: true}), req.user.hashedId);
       result.push(deal);
     }
     return res.send(result);
@@ -116,8 +116,10 @@ exports.getDeal = function(req, res) {
 
 exports.likeDeal = function(req, res) {
   db.DealLike.findOne({
-    UserAccountHashedId: req.user.hashedId,
-    DealId: req.deal.id
+    where: {
+      UserAccountHashedId: req.user.hashedId,
+      DealId: req.deal.id
+    }
   }).then(function(like) {
     if (like) {
       like.destroy().then(function() {
@@ -150,13 +152,14 @@ exports.getLikedDeals = function(req, res) {
         UserAccountHashedId: req.otherUser.hashedId
       },
       include: [{
-        model: db.Deal
+        model: db.Deal,
+        include: db.DealLike
       }],
       order: [['createdAt', 'DESC']]
     }).then(function(likes) {
       var result = [];
       for (var i = 0; i < likes.length; i++) {
-        var deal = likes[i].get({plain: true}).Deal;
+        var deal = formatDeal(likes[i].get({plain: true}).Deal, req.user.hashedId);
         result.push(deal);
       }
       return res.send(result);
@@ -182,9 +185,15 @@ exports.getMutualLikedDeals = function(req, res) {
           ['`id` IN (SELECT `DealId` FROM DealLike WHERE `UserAccountHashedId`=?)', req.otherUser.hashedId]
         ]
       },
-      order: [['createdAt', 'DESC']]
+      order: [['createdAt', 'DESC']],
+      include: [db.DealLike]
     }).then(function(deals) {
-      return res.send(deals);
+      var result = [];
+      for (var i = 0; i < deals.length; i++) {
+        var deal = formatDeal(deals[i].get({plain: true}), req.user.hashedId);
+        result.push(deal);
+      }
+      return res.send(result);
     });
   } else {
     return res.status(404).send({
