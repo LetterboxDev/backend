@@ -129,7 +129,8 @@ exports.getRoomMessages = function(req, res) {
   }
   db.Message.findAll({
     where: whereClause,
-    order: [['timeSent', 'ASC']]
+    order: [['timeSent', 'ASC']],
+    include: [db.Deal]
   }).then(function(messages) {
     return res.send(messages);
   });
@@ -150,7 +151,8 @@ exports.getMessages = function(req, res) {
   }
   db.Message.findAll({
     where: whereClause,
-    order: [['timeSent', 'ASC']]
+    order: [['timeSent', 'ASC']],
+    include: [db.Deal]
   }).then(function(messages) {
     return res.send(messages);
   });
