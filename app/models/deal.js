@@ -29,7 +29,6 @@ module.exports = function(sequelize, DataTypes) {
       Deal.belongsTo(models.DealCategory, {onDelete: 'CASCADE'});
       Deal.belongsTo(models.DealProvider, {onDelete: 'CASCADE'});
       Deal.hasMany(models.DealLike, {onDelete: 'CASCADE'});
-      Deal.hasMany(models.DealShare, {onDelete: 'CASCADE'});
     },
     timestamps: true, // sets createdAt and updatedAt
     paranoid: false, // disables soft deletion
