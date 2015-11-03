@@ -28,7 +28,18 @@ exports.getDealById = function(req, res, next, dealId) {
     include: [db.DealLike]
   }).then(function(deal) {
     if (deal) {
+      var plainDeal = deal.get({plain: true});
+      plainDeal.likeCount = plainDeal.DealLikes.length;
+      for (var j = 0; j < plainDeal.likeCount; j++) {
+        if (plainDeal.DealLikes[j].UserAccountHashedId === req.user.hashedId) {
+          plainDeal.isLiked = true;
+          break;
+        }
+      }
+      if (!plainDeal.isLiked) plainDeal.isLiked = false;
+      delete plainDeal.DealLikes;
       req.deal = deal;
+      req.plainDeal = plainDeal;
       return next();
     } else {
       return res.status(404).send({
@@ -100,7 +111,7 @@ exports.getDeals = function(req, res) {
 };
 
 exports.getDeal = function(req, res) {
-  return res.send(req.deal);
+  return res.send(req.plainDeal);
 };
 
 exports.likeDeal = function(req, res) {
