@@ -16,6 +16,18 @@ function formatDeal(plainDeal, hashedId) {
   return plainDeal;
 }
 
+exports.getFeaturedDeals = function(req, res) {
+  db.FeaturedDeal.findAll({
+    include: [db.Deal]
+  }).then(function(features) {
+    var deals = [];
+    for (var i = 0; i < features.length; i++) {
+      deals.push(formatDeal(features[i].get({plain: true}).Deal), req.user.hashedId);
+    }
+    return res.send(deals);
+  });
+};
+
 exports.getDealCategory = function(req, res, next, dealCat) {
   if (dealCat === 'all') {
     req.category = 'all';
