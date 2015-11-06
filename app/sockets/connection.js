@@ -14,8 +14,6 @@ function createMessage(sender, recipient, type, content, RoomHash, deal) {
       RoomHash: RoomHash,
       DealId: deal ? deal.id : null
     }).then(function(message) {
-      message = message.get({plain: true});
-      message.Deal = deal;
       require('./notifier').notifyOfMessage(user.firstName, message);
     });
   });
@@ -42,7 +40,8 @@ io.on('connection', function(socket) {
           db.Deal.findOne({
             where: {
               id: data.dealId
-            }
+            },
+            include: [db.DealLike, db.DealImage]
           }).then(function(deal) {
             if (deal) {
               createMessage(sender, recipient, 'share', data.message, data.roomHash, deal);
