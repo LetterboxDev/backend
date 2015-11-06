@@ -13,7 +13,7 @@ var sequelize = new Sequelize(dbEnvironment.db.name, dbEnvironment.db.username, 
   host: dbEnvironment.db.host,
   password: dbEnvironment.db.password,
   dialect: 'mysql',
-  logging: logger.verbose
+  logging: false
 });
 
 fs.readdirSync(config.modelsPath).filter(function(file) {
