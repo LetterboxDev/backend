@@ -9,13 +9,6 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.TEXT,
       allowNull: false
     },
-    image: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      validate: {
-        isUrl: true
-      }
-    },
     location: {
       type: DataTypes.TEXT,
       allowNull: false
@@ -23,13 +16,20 @@ module.exports = function(sequelize, DataTypes) {
     expiry: {
       type: DataTypes.DATE,
       allowNull: false
+    },
+    type: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      defaultValue: 'deal'
     }
   }, {
     associate: function(models) {
       Deal.belongsTo(models.DealCategory, {onDelete: 'CASCADE'});
       Deal.belongsTo(models.DealProvider, {onDelete: 'CASCADE'});
       Deal.hasMany(models.DealLike, {onDelete: 'CASCADE'});
+      Deal.hasMany(models.DealImage, {onDelete: 'CASCADE'});
     },
+    charset: 'utf8',
     timestamps: true, // sets createdAt and updatedAt
     paranoid: false, // disables soft deletion
   });
