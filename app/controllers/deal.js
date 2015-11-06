@@ -27,7 +27,7 @@ exports.getFeaturedDeals = function(req, res) {
   db.FeaturedDeal.findAll({
     include: [{
       model: db.Deal,
-      include: db.DealImage
+      include: [db.DealImage, db.DealLike]
     }]
   }).then(function(features) {
     var deals = [];
