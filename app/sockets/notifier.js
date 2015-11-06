@@ -3,6 +3,7 @@ var logger = require('../../config/logger');
 var connectionsCounter = require('./countconnections');
 var db = require('../../config/sequelize');
 var https = require('https');
+var dealController = require('../controllers/deal');
 
 function sendPushNotification(hashedId, message, type, id) {
   db.UserAccount.findOne({
@@ -93,10 +94,20 @@ exports.notifyOfRoom = function(letterSender, room, approver) {
 };
 
 exports.notifyOfMessage = function(senderName, message) {
-  var res = {senderName: senderName, message: message};
-  io.to(message.sender).emit('roomMessage', res);
+  var senderMessage = message.get({plain: true});
+  var recipientMessage = message.get({plain: true});
+  var rawDeal = message.Deal;
+  var senderDeal = null;
+  var recipientDeal = null;
+  if (rawDeal) {
+    senderDeal = dealController.formatDeal(rawDeal.get({plain: true}), message.sender);
+    recipientDeal = dealController.formatDeal(rawDeal.get({plain: true}), message.recipient);
+  }
+  senderMessage.Deal = senderDeal;
+  recipientMessage.Deal = recipientDeal;
+  io.to(message.sender).emit('roomMessage', {senderName: senderName, message: senderMessage});
   if (connectionsCounter.countUserConnections(message.recipient)) {
-    io.to(message.recipient).emit('roomMessage', res);
+    io.to(message.recipient).emit('roomMessage', {senderName: senderName, message: recipientMessage});
   } else {
     // send notification of message from senderName
     sendPushNotification(message.recipient, senderName + ": " + message.content, 'app.chat', message.RoomHash);
