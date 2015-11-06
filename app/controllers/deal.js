@@ -11,14 +11,22 @@ function formatDeal(plainDeal, hashedId) {
       break;
     }
   }
+  plainDeal.images = [];
+  for (var i = 0; i < plainDeal.DealImages.length; i++) {
+    plainDeal.images.push(plainDeal.DealImages[i].url);
+  }
   if (!plainDeal.isLiked) plainDeal.isLiked = false;
   delete plainDeal.DealLikes;
+  delete plainDeal.DealImages;
   return plainDeal;
 }
 
 exports.getFeaturedDeals = function(req, res) {
   db.FeaturedDeal.findAll({
-    include: [db.Deal]
+    include: [{
+      model: db.Deal,
+      include: db.DealImage
+    }]
   }).then(function(features) {
     var deals = [];
     for (var i = 0; i < features.length; i++) {
@@ -55,7 +63,7 @@ exports.getDealById = function(req, res, next, dealId) {
     where: {
       id: dealId
     },
-    include: [db.DealLike]
+    include: [db.DealLike, db.DealImage]
   }).then(function(deal) {
     if (deal) {
       var plainDeal = deal.get({plain: true});
@@ -111,7 +119,7 @@ exports.getDeals = function(req, res) {
   db.Deal.findAll({
     where: whereClause,
     order: [['createdAt', 'DESC']],
-    include: [db.DealLike]
+    include: [db.DealLike, db.DealImage]
   }).then(function(deals) {
     var result = [];
     for (var i = 0; i < deals.length; i++) {
@@ -165,7 +173,7 @@ exports.getLikedDeals = function(req, res) {
       },
       include: [{
         model: db.Deal,
-        include: db.DealLike
+        include: [db.DealLike, db.DealImage]
       }],
       order: [['createdAt', 'DESC']]
     }).then(function(likes) {
@@ -198,7 +206,7 @@ exports.getMutualLikedDeals = function(req, res) {
         ]
       },
       order: [['createdAt', 'DESC']],
-      include: [db.DealLike]
+      include: [db.DealLike, db.DealImage]
     }).then(function(deals) {
       var result = [];
       for (var i = 0; i < deals.length; i++) {
