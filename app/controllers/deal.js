@@ -21,6 +21,8 @@ function formatDeal(plainDeal, hashedId) {
   return plainDeal;
 }
 
+exports.formatDeal = formatDeal;
+
 exports.getFeaturedDeals = function(req, res) {
   db.FeaturedDeal.findAll({
     include: [{
