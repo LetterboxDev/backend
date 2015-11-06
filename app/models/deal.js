@@ -29,7 +29,6 @@ module.exports = function(sequelize, DataTypes) {
       Deal.hasMany(models.DealLike, {onDelete: 'CASCADE'});
       Deal.hasMany(models.DealImage, {onDelete: 'CASCADE'});
     },
-    charset: 'utf8',
     timestamps: true, // sets createdAt and updatedAt
     paranoid: false, // disables soft deletion
   });
