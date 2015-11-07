@@ -684,6 +684,37 @@ exports.setPerfectMatch = function(req, res) {
   }
 };
 
+exports.getOtherUserVersion = function(req, res) {
+  return res.send({
+    major: req.otherUser.versionMajor,
+    minor: req.otherUser.versionMinor,
+    revision: req.otherUser.versionRevision,
+    version: req.otherUser.versionMajor + "." + req.otherUser.versionMinor + "." + req.otherUser.versionRevision
+  });
+};
+
+exports.setVersion = function(req, res) {
+  if (typeof req.body.major !== 'undefined' && typeof req.body.minor !== 'undefined' && typeof req.body.revision !== 'undefined') {
+    req.user.update({
+      versionMajor: req.body.major,
+      versionMinor: req.body.minor,
+      versionRevision: req.body.revision
+    }).then(function(user) {
+      return res.send({
+        status: 'success',
+        major: user.versionMajor,
+        minor: user.versionMinor,
+        revision: user.versionRevision,
+        version: user.versionMajor + "." + user.versionMinor + "." + user.versionRevision
+      }); 
+    });
+  } else {
+   return res.status(400).send({
+      error: 'invalid request body'
+    }); 
+  }
+};
+
 function isFloat(n) {
   return n === Number(n) && n % 1 !== 0;
 }

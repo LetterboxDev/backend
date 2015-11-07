@@ -77,6 +77,21 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
       allowNull: false
+    },
+    versionMajor: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0,
+      allowNull: false
+    },
+    versionMinor: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0,
+      allowNull: false
+    },
+    versionRevision: {
+      type: DataTypes.INTEGER,
+      defaultValue: 2,
+      allowNull: false
     }
   }, {
     associate: function(models) {
