@@ -32,7 +32,7 @@ exports.getFeaturedDeals = function(req, res) {
   }).then(function(features) {
     var deals = [];
     for (var i = 0; i < features.length; i++) {
-      deals.push(formatDeal(features[i].get({plain: true}).Deal), req.user.hashedId);
+      deals.push(formatDeal(features[i].get({plain: true}).Deal , req.user.hashedId));
     }
     return res.send(deals);
   });
