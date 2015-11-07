@@ -90,6 +90,7 @@ exports.checkFacebookTokenParam = function(req, res, next) {
 };
 
 exports.validateFacebookToken = function(req, res, next) {
+  graph.setAppSecret(process.env.FACEBOOK_APP_SECRET);
   graph.setAccessToken(req.fb_token);
   graph.get('/me?fields=id,first_name,last_name,birthday,gender,picture', function(err, fbResponse) {
     if (!err && fbResponse) {
@@ -109,6 +110,7 @@ exports.validateFacebookToken = function(req, res, next) {
 };
 
 exports.getMediumProfilePicture = function(req, res, next) {
+  graph.setAppSecret(process.env.FACEBOOK_APP_SECRET);
   graph.setAccessToken(req.fb_token);
   graph.get('/me/picture?height=400&width=400', function(err, fbResponse) {
     if (!err && fbResponse) {
@@ -123,6 +125,7 @@ exports.getMediumProfilePicture = function(req, res, next) {
 };
 
 exports.extendFacebookToken = function(req, res, next) {
+  graph.setAppSecret(process.env.FACEBOOK_APP_SECRET);
   graph.setAccessToken(req.fb_token);
   graph.extendAccessToken({
     'access_token': req.fb_token,
@@ -341,6 +344,7 @@ exports.sendMatch = function(req, res) {
       questions.push(user.UserWyrQuestions[i].WyrQuestion);
     }
     var age = (new Date()).getYear() - user.birthday.getYear();
+    graph.setAppSecret(process.env.FACEBOOK_APP_SECRET);
     graph.setAccessToken(req.user.accessToken);
     graph.get('/' + user.profileId + '?fields=context.fields%28mutual_friends%29', function(err, fbResponse) {
       if (!err && fbResponse) {
@@ -582,6 +586,7 @@ exports.clearPushToken = function(req, res) {
 };
 
 exports.getProfilePhotoAlbum = function(req, res, next) {
+  graph.setAppSecret(process.env.FACEBOOK_APP_SECRET);
   graph.setAccessToken(req.user.accessToken);
   graph.get('/me/albums', function(err, fbResponse) {
     if (!err && fbResponse.data) {
@@ -606,6 +611,7 @@ exports.getProfilePhotoAlbum = function(req, res, next) {
 
 exports.getProfilePhotos = function(req, res) {
   var albumId = req.album.id;
+  graph.setAppSecret(process.env.FACEBOOK_APP_SECRET);
   graph.setAccessToken(req.user.accessToken);
   graph.get(albumId + '/photos?fields=picture', function(err, fbResponse) {
     if (!err && fbResponse.data) {
@@ -620,6 +626,7 @@ exports.getProfilePhotos = function(req, res) {
 
 exports.checkPictureId = function(req, res, next) {
   if (typeof req.body.id !== 'undefined') {
+    graph.setAppSecret(process.env.FACEBOOK_APP_SECRET);
     graph.setAccessToken(req.user.accessToken);
     graph.get(req.body.id + '?fields=picture,from', function(err, fbResponse) {
       if (!err && fbResponse && fbResponse.from.id === req.user.profileId) {
@@ -639,6 +646,7 @@ exports.checkPictureId = function(req, res, next) {
 };
 
 exports.getMediumPhoto = function(req, res, next) {
+  graph.setAppSecret(process.env.FACEBOOK_APP_SECRET);
   graph.setAccessToken(req.user.accessToken);
   graph.get(req.body.id + '/picture', function(err, fbResponse) {
     if (!err && fbResponse && fbResponse.location) {
