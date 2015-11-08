@@ -250,6 +250,10 @@ exports.getUser = function(req, res, next, hashedId) {
   }).then(function(user) {
     if (user) {
       req.otherUser = user.get({plain: true});
+      req.likedDeals = [];
+      for (var i = 0; i < req.otherUser.DealLikes.length; i++) {
+        req.likedDeals.push(dealController.formatDeal(req.otherUser.DealLikes[i].Deal, req.user.hashedId));
+      }
       return next();
     } else {
       return res.status(404).send({
@@ -345,7 +349,7 @@ exports.getMatchLikedDeals = function(req, res, next) {
   }).then(function(likes) {
     var deals = [];
     for (var i = 0; i < likes.length; i++) {
-      deals.push(dealController.formatDeal(likes[i].get({plain: true}).Deal));
+      deals.push(dealController.formatDeal(likes[i].get({plain: true}).Deal, req.user.hashedId));
     }
     req.matchDeals = deals;
     return next();
@@ -582,7 +586,8 @@ exports.getOtherUser = function(req, res) {
     questions: questions,
     pictureThumb: req.otherUser.pictureThumb,
     pictureMed: req.otherUser.pictureMed,
-    mutualFriends: []
+    mutualFriends: [],
+    likedDeals: req.likedDeals
   });
 };
 
