@@ -577,17 +577,36 @@ exports.getOtherUser = function(req, res) {
     questions.push(req.otherUser.UserWyrQuestions[i].WyrQuestion);
   }
   var age = (new Date()).getYear() - req.otherUser.birthday.getYear();
-  return res.send({
-    hashedId: req.otherUser.hashedId,
-    gender: req.otherUser.gender,
-    firstName: req.otherUser.firstName,
-    bio: req.otherUser.bio,
-    age: age,
-    questions: questions,
-    pictureThumb: req.otherUser.pictureThumb,
-    pictureMed: req.otherUser.pictureMed,
-    mutualFriends: [],
-    likedDeals: req.likedDeals
+  graph.setAppSecret(process.env.FACEBOOK_APP_SECRET);
+  graph.setAccessToken(req.user.accessToken);
+  graph.get('/' + req.otherUser.profileId + '?fields=context.fields%28mutual_friends%29', function(err, fbResponse) {
+    if (!err && fbResponse) {
+      return res.send({
+        hashedId: req.otherUser.hashedId,
+        gender: req.otherUser.gender,
+        firstName: req.otherUser.firstName,
+        bio: req.otherUser.bio,
+        age: age,
+        questions: questions,
+        pictureThumb: req.otherUser.pictureThumb,
+        pictureMed: req.otherUser.pictureMed,
+        mutualFriends: fbResponse.context.mutual_friends,
+        likedDeals: req.likedDeals
+      });
+    } else {
+      return res.send({
+        hashedId: req.otherUser.hashedId,
+        gender: req.otherUser.gender,
+        firstName: req.otherUser.firstName,
+        bio: req.otherUser.bio,
+        age: age,
+        questions: questions,
+        pictureThumb: req.otherUser.pictureThumb,
+        pictureMed: req.otherUser.pictureMed,
+        mutualFriends: undefined,
+        likedDeals: req.likedDeals
+      });
+    }
   });
 };
 
