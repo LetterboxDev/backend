@@ -6,6 +6,7 @@ var config = require('../../config/config');
 var token = require('../../config/token');
 var db = require('../../config/sequelize');
 var graph = require('fbgraph');
+var dealController = require('./deal');
 
 var getDistanceMatchAttributes = function(myLat, myLon) {
   return [
@@ -236,12 +237,16 @@ exports.getUser = function(req, res, next, hashedId) {
     where: {
       hashedId: hashedId
     },
-    include: [
-      {
-        model: db.UserWyrQuestion,
-        include: db.WyrQuestion
-      }
-    ]
+    include: [{
+      model: db.UserWyrQuestion,
+      include: db.WyrQuestion
+    }, {
+      model: db.DealLike,
+      include: [{
+        model: db.Deal,
+        include: [db.DealLike, db.DealImage]
+      }]
+    }]
   }).then(function(user) {
     if (user) {
       req.otherUser = user.get({plain: true});
@@ -327,6 +332,26 @@ exports.getMatch = function(req, res, next) {
   }
 };
 
+exports.getMatchLikedDeals = function(req, res, next) {
+  db.DealLike.findAll({
+    where: {
+      UserAccountHashedId: req.matchingUser.hashedId
+    },
+    include: [{
+      model: db.Deal,
+      include: [db.DealLike, db.DealImage]
+    }],
+    order: [['createdAt', 'DESC']]
+  }).then(function(likes) {
+    var deals = [];
+    for (var i = 0; i < likes.length; i++) {
+      deals.push(dealController.formatDeal(likes[i].get({plain: true}).Deal));
+    }
+    req.matchDeals = deals;
+    return next();
+  });
+};
+
 exports.sendMatch = function(req, res) {
   db.UserAccount.findOne({
     where: {
@@ -359,7 +384,8 @@ exports.sendMatch = function(req, res) {
           pictureMed: user.pictureMed,
           distance: req.matchingUser.dataValues.distance,
           age: age,
-          mutualFriends: fbResponse.context.mutual_friends
+          mutualFriends: fbResponse.context.mutual_friends,
+          likedDeals: req.matchDeals
         });
       } else {
         return res.send({
@@ -373,7 +399,8 @@ exports.sendMatch = function(req, res) {
           pictureMed: user.pictureMed,
           distance: req.matchingUser.dataValues.distance,
           age: age,
-          mutualFriends: undefined
+          mutualFriends: undefined,
+          likedDeals: req.matchDeals
         });
       }
     });

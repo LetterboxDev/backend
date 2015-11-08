@@ -17,7 +17,7 @@ exports.init = function(app) {
   app.put('/user/genderPreference', userController.requireAuthentication, userController.updateGenderPreference);
   app.put('/user/version', userController.requireAuthentication, userController.setVersion);
 
-  app.get('/match', userController.requireAuthentication, userController.getMatch, userController.sendMatch);
+  app.get('/match', userController.requireAuthentication, userController.getMatch, userController.getMatchLikedDeals, userController.sendMatch);
   app.get('/matches', userController.requireAuthentication, userController.getMultipleMatches, userController.sendMultipleMatches);
   
   app.param('hashedId', userController.getUser);
