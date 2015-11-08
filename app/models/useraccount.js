@@ -96,6 +96,7 @@ module.exports = function(sequelize, DataTypes) {
   }, {
     associate: function(models) {
       User.hasMany(models.UserWyrQuestion);
+      User.hasMany(models.DealLike);
     },
     timestamps: true, // sets createdAt and updatedAt
     paranoid: false, // disables soft deletion
