@@ -3,6 +3,7 @@
  */
 
 var db = require('../../config/sequelize');
+var dealController = require('./deal');
 
 exports.getRooms = function(req, res) {
   db.Room.findAll({
@@ -130,9 +131,19 @@ exports.getRoomMessages = function(req, res) {
   db.Message.findAll({
     where: whereClause,
     order: [['timeSent', 'ASC']],
-    include: [db.Deal]
+    include: [{
+      model: db.Deal,
+      include: [db.DealLike, db.DealImage]
+    }]
   }).then(function(messages) {
-    return res.send(messages);
+    var plainMessages = messages.get({plain: true});
+    for (var i = 0; plainMessages.length; i++) {
+      var plainMessage = plainMessages[i];
+      if (plainMessage.Deal) {
+        plainMessage.Deal = dealController.formatDeal(plainMessage.Deal, req.user.hashedId);        
+      }
+    }
+    return res.send(plainMessages);
   });
 };
 
