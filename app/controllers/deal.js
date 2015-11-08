@@ -15,6 +15,14 @@ function formatDeal(plainDeal, hashedId) {
   for (var i = 0; i < plainDeal.DealImages.length; i++) {
     plainDeal.images.push(plainDeal.DealImages[i].url);
   }
+  if (plainDeal.images.length) {
+    var imgurImageSize = "b";
+    var imageUrl = plainDeal.images[0];
+    var dotIndex = imageUrl.lastIndexOf('.');
+    plainDeal.thumbnail = imageUrl.substr(0, dotIndex) +
+                          imgurImageSize +
+                          imageUrl.substr(dotIndex);
+  }
   if (!plainDeal.isLiked) plainDeal.isLiked = false;
   delete plainDeal.DealLikes;
   delete plainDeal.DealImages;
