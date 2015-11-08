@@ -136,12 +136,13 @@ exports.getRoomMessages = function(req, res) {
       include: [db.DealLike, db.DealImage]
     }]
   }).then(function(messages) {
-    var plainMessages = messages.get({plain: true});
-    for (var i = 0; plainMessages.length; i++) {
-      var plainMessage = plainMessages[i];
+    var plainMessages = [];
+    for (var i = 0; messages.length; i++) {
+      var plainMessage = messages[i].get({plain: true});
       if (plainMessage.Deal) {
         plainMessage.Deal = dealController.formatDeal(plainMessage.Deal, req.user.hashedId);        
       }
+      plainMessages.push(plainMessage);
     }
     return res.send(plainMessages);
   });
