@@ -137,7 +137,7 @@ exports.getRoomMessages = function(req, res) {
     }]
   }).then(function(messages) {
     var plainMessages = [];
-    for (var i = 0; messages.length; i++) {
+    for (var i = 0; i < messages.length; i++) {
       var plainMessage = messages[i].get({plain: true});
       if (plainMessage.Deal) {
         plainMessage.Deal = dealController.formatDeal(plainMessage.Deal, req.user.hashedId);        
