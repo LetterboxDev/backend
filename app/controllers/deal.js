@@ -203,8 +203,8 @@ exports.getMutualLikedDeals = function(req, res) {
     db.Deal.findAll({
       where: {
         $and: [
-          ['`id` IN (SELECT `DealId` FROM `DealLikes` WHERE `UserAccountHashedId`=?)', req.user.hashedId],
-          ['`id` IN (SELECT `DealId` FROM `DealLikes` WHERE `UserAccountHashedId`=?)', req.otherUser.hashedId]
+          ['Deal.id IN (SELECT `DealId` FROM `DealLikes` WHERE `UserAccountHashedId`=?)', req.user.hashedId],
+          ['Deal.id IN (SELECT `DealId` FROM `DealLikes` WHERE `UserAccountHashedId`=?)', req.otherUser.hashedId]
         ]
       },
       order: [['createdAt', 'DESC']],
