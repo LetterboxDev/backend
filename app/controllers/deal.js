@@ -35,7 +35,7 @@ exports.getFeaturedDeals = function(req, res) {
   db.FeaturedDeal.findAll({
     include: [{
       model: db.Deal,
-      include: [db.DealImage, db.DealLike]
+      include: [db.DealImage, db.DealLike, db.DealProvider]
     }]
   }).then(function(features) {
     var deals = [];
@@ -73,7 +73,7 @@ exports.getDealById = function(req, res, next, dealId) {
     where: {
       id: dealId
     },
-    include: [db.DealLike, db.DealImage]
+    include: [db.DealLike, db.DealImage, db.DealProvider]
   }).then(function(deal) {
     if (deal) {
       var plainDeal = deal.get({plain: true});
@@ -129,7 +129,7 @@ exports.getDeals = function(req, res) {
   db.Deal.findAll({
     where: whereClause,
     order: [['createdAt', 'DESC']],
-    include: [db.DealLike, db.DealImage]
+    include: [db.DealLike, db.DealImage, db.DealProvider]
   }).then(function(deals) {
     var result = [];
     for (var i = 0; i < deals.length; i++) {
@@ -183,7 +183,7 @@ exports.getLikedDeals = function(req, res) {
       },
       include: [{
         model: db.Deal,
-        include: [db.DealLike, db.DealImage]
+        include: [db.DealLike, db.DealImage, db.DealProvider]
       }],
       order: [['createdAt', 'DESC']]
     }).then(function(likes) {
@@ -216,7 +216,7 @@ exports.getMutualLikedDeals = function(req, res) {
         ]
       },
       order: [['createdAt', 'DESC']],
-      include: [db.DealLike, db.DealImage]
+      include: [db.DealLike, db.DealImage, db.DealProvider]
     }).then(function(deals) {
       var result = [];
       for (var i = 0; i < deals.length; i++) {

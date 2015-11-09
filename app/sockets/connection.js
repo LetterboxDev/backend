@@ -41,7 +41,7 @@ io.on('connection', function(socket) {
             where: {
               id: data.dealId
             },
-            include: [db.DealLike, db.DealImage]
+            include: [db.DealLike, db.DealImage, db.DealProvider]
           }).then(function(deal) {
             if (deal) {
               createMessage(sender, recipient, 'share', data.message, data.roomHash, deal);

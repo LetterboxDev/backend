@@ -133,7 +133,7 @@ exports.getRoomMessages = function(req, res) {
     order: [['timeSent', 'ASC']],
     include: [{
       model: db.Deal,
-      include: [db.DealLike, db.DealImage]
+      include: [db.DealLike, db.DealImage, db.DealProvider]
     }]
   }).then(function(messages) {
     var plainMessages = [];

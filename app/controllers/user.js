@@ -244,7 +244,7 @@ exports.getUser = function(req, res, next, hashedId) {
       model: db.DealLike,
       include: [{
         model: db.Deal,
-        include: [db.DealLike, db.DealImage]
+        include: [db.DealLike, db.DealImage, db.DealProvider]
       }]
     }]
   }).then(function(user) {
@@ -343,7 +343,7 @@ exports.getMatchLikedDeals = function(req, res, next) {
     },
     include: [{
       model: db.Deal,
-      include: [db.DealLike, db.DealImage]
+      include: [db.DealLike, db.DealImage, db.DealProvider]
     }],
     order: [['createdAt', 'DESC']]
   }).then(function(likes) {
