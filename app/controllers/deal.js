@@ -32,12 +32,19 @@ function formatDeal(plainDeal, hashedId) {
 exports.formatDeal = formatDeal;
 
 exports.getFeaturedDeals = function(req, res) {
-  db.FeaturedDeal.findAll({
+  var query = {
     include: [{
       model: db.Deal,
       include: [db.DealImage, db.DealLike, db.DealProvider]
     }]
-  }).then(function(features) {
+  };
+  if (req.query.limit) {
+    query.limit = req.query.limit;
+  }
+  if (req.query.offset) {
+    query.offset = req.query.offset;
+  }
+  db.FeaturedDeal.findAll(query).then(function(features) {
     var deals = [];
     for (var i = 0; i < features.length; i++) {
       deals.push(formatDeal(features[i].get({plain: true}).Deal , req.user.hashedId));
@@ -126,11 +133,18 @@ exports.getDeals = function(req, res) {
   if (req.query.removeLiked) {
     whereClause.$and = [['`id` NOT IN (SELECT `DealId` FROM `DealLike` WHERE `UserAccountHashedId`=?)', req.user.hashedId]];
   }
-  db.Deal.findAll({
+  var query = {
     where: whereClause,
     order: [['createdAt', 'DESC']],
     include: [db.DealLike, db.DealImage, db.DealProvider]
-  }).then(function(deals) {
+  };
+  if (req.query.limit) {
+    query.limit = req.query.limit;
+  }
+  if (req.query.offset) {
+    query.offset = req.query.offset;
+  }
+  db.Deal.findAll(query).then(function(deals) {
     var result = [];
     for (var i = 0; i < deals.length; i++) {
       var deal = formatDeal(deals[i].get({plain: true}), req.user.hashedId);
