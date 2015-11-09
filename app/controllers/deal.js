@@ -16,7 +16,7 @@ function formatDeal(plainDeal, hashedId) {
     plainDeal.images.push(plainDeal.DealImages[i].url);
   }
   if (plainDeal.images.length) {
-    var imgurImageSize = "b";
+    var imgurImageSize = "m";
     var imageUrl = plainDeal.images[0];
     var dotIndex = imageUrl.lastIndexOf('.');
     plainDeal.thumbnail = imageUrl.substr(0, dotIndex) +
