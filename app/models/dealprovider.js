@@ -5,6 +5,13 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.STRING,
       allowNull: false,
       primaryKey: true
+    },
+    url: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        isUrl: true
+      }
     }
   }, {
     associate: function(models) {
