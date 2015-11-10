@@ -107,7 +107,8 @@ exports.getRoom = function(req, res, next, roomId) {
         req.letter.questions.push({
           option0: letterAnswer.WyrQuestion.option0,
           option1: letterAnswer.WyrQuestion.option1,
-          answer: letterAnswer.answer
+          answer: letterAnswer.answer,
+          isCorrect: letterAnswer.isCorrect
         });
       }
       return next();
