@@ -56,7 +56,8 @@ var createAnswersRecursively = function(letterHash, questions, index, promise) {
     db.LetterAnswer.create({
       answer: questions[index].answer,
       LetterHash: letterHash,
-      WyrQuestionId: questions[index].id
+      WyrQuestionId: questions[index].id,
+      isCorrect: questions[index].isCorrect
     }).then(function(answer) {
       return createAnswersRecursively(letterHash, questions, index+1, promise);
     });
@@ -86,23 +87,21 @@ exports.createLetter = function(req, res, next) {
 };
 
 exports.checkPerfectMatch = function(req, res, next) {
-  if (!req.recipient.perfectMatch) {
-    var recipientQuestions = req.recipient.UserWyrQuestions;
-    var replyAnswers = req.body.questions;
-    for (var i = 0; i < recipientQuestions.length; i++) {
-      var question = recipientQuestions[i];
-      for (var j = 0; j < replyAnswers.length; j++) {
-        var replyAnswer = replyAnswers[i];
-        if (question.WyrQuestionId === replyAnswer.id) {
-          if (question.answer !== replyAnswer.answer) {
-            req.isPerfectMatch = false;
-            return next();
-          }
-          break;
+  var recipientQuestions = req.recipient.UserWyrQuestions;
+  var replyAnswers = req.body.questions;
+  req.isPerfectMatch = true;
+  for (var i = 0; i < recipientQuestions.length; i++) {
+    var question = recipientQuestions[i];
+    for (var j = 0; j < replyAnswers.length; j++) {
+      var replyAnswer = replyAnswers[i];
+      if (question.WyrQuestionId === replyAnswer.id) {
+        replyAnswer.isCorrect = question.answer === replyAnswer.answer;
+        if (!replyAnswer.isCorrect) {
+          req.isPerfectMatch = false;
         }
+        break;
       }
     }
-    req.isPerfectMatch = true;
   }
   return next();
 };
