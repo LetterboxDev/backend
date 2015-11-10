@@ -4,6 +4,10 @@ module.exports = function(sequelize, DataTypes) {
     answer: {
       type: DataTypes.BOOLEAN,
       allowNull: false
+    },
+    isCorrect: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false
     }
   }, {
     associate: function(models) {
