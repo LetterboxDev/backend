@@ -155,6 +155,23 @@ exports.getRecipient = function(req, res, next) {
   });
 };
 
+exports.checkIsLatestMatch = function(req, res, next) {
+  db.Match.findOne({
+    where: {
+      matcherHashedId: req.user.hashedId
+    },
+    order: [['createdAt', 'DESC']]
+  }).then(function(match) {
+    if (!match || match.matcheeHashedId !== req.recipient.hashedId) {
+      return res.status(400).send({
+        error: 'no longer latest match'
+      });
+    } else {
+      return next();
+    }
+  });
+};
+
 exports.approveLetter = function(req, res) {
   if (req.letter.recipient === req.user.hashedId && !req.letter.isApproved && !req.letter.isRejected) {
     req.letter.update({
