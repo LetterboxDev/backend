@@ -16,12 +16,16 @@ function formatDeal(plainDeal, hashedId) {
     plainDeal.images.push(plainDeal.DealImages[i].url);
   }
   if (plainDeal.images.length) {
-    var imgurImageSize = "l";
+    var imgurThumbSize = "l";
     var imageUrl = plainDeal.images[0];
     var dotIndex = imageUrl.lastIndexOf('.');
     plainDeal.thumbnail = imageUrl.substr(0, dotIndex) +
-                          imgurImageSize +
+                          imgurThumbSize +
                           imageUrl.substr(dotIndex);
+    var imgurSmallSize = "b";
+    plainDeal.small = imageUrl.substr(0, dotIndex) +
+                      imgurSmallSize +
+                      imageUrl.substr(dotIndex);
   }
   if (!plainDeal.isLiked) plainDeal.isLiked = false;
   delete plainDeal.DealLikes;
