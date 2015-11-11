@@ -138,7 +138,9 @@ exports.checkLetterHashExists = function(req, res, next) {
 exports.getRecipient = function(req, res, next) {
   db.UserAccount.findOne({
     where: {
-      hashedId: req.body.recipient
+      hashedId: req.body.recipient,
+      gender: req.user.genderPreference,
+      genderPreference: req.user.gender
     },
     include: [{model: db.UserWyrQuestion}]
   }).then(function(user) {
