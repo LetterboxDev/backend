@@ -287,6 +287,20 @@ function getMaxBirthday(minAge) {
   return maxBirthday;
 }
 
+exports.clearRecordedMatches = function(req, res, next) {
+  if (req.query.previousId) {
+    db.Match.destroy({
+      where: {
+        matcheeHashedId: req.user.hashedId
+      }
+    }).then(function(affectedRows) {
+      return next();
+    })
+  } else {
+    return next();
+  }
+};
+
 exports.getMatch = function(req, res, next) {
   var maxDistance = Number(req.query.maxDistance);
   var previousId = req.query.previousId;
@@ -313,7 +327,8 @@ exports.getMatch = function(req, res, next) {
         $and: [
           ['`hashedId` NOT IN (SELECT `recipient` FROM `Letters` WHERE `UserAccountHashedId`=?)', req.user.hashedId],
           ['`hashedId` NOT IN (SELECT `UserAccountHashedId` FROM `Letters` WHERE `recipient`=?)', req.user.hashedId],
-          ['`hashedId` NOT IN (SELECT `reportee` FROM `Reports` WHERE `reporter`=?)', req.user.hashedId]
+          ['`hashedId` NOT IN (SELECT `reportee` FROM `Reports` WHERE `reporter`=?)', req.user.hashedId],
+          ['`hashedId` NOT IN (SELECT `matcheeHashedId` FROM `Matches` WHERE `matcherHashedId`=?)', req.user.hashedId]
         ]
       },
       having: ['distance <= ?', maxDistance],
@@ -334,6 +349,15 @@ exports.getMatch = function(req, res, next) {
       error: 'invalid maxDistance'
     });
   }
+};
+
+exports.recordMatch = function(req, res, next) {
+  db.Match.create({
+    matcherHashedId: req.user.hashedId,
+    matcheeHashedId: req.matchingUser.hashedId
+  }).then(function(match) {
+    return next();
+  });
 };
 
 exports.getMatchLikedDeals = function(req, res, next) {
