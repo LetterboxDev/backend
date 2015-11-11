@@ -291,7 +291,7 @@ exports.clearRecordedMatches = function(req, res, next) {
   if (req.query.previousId) {
     db.Match.destroy({
       where: {
-        matcheeHashedId: req.user.hashedId
+        matcherHashedId: req.user.hashedId
       }
     }).then(function(affectedRows) {
       return next();
