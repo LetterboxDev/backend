@@ -29,7 +29,7 @@ exports.getLetters = function(req, res) {
       include: db.WyrQuestion
     },{
       model: db.UserAccount,
-      attributes: ['firstName', 'gender', 'birthday', 'bio', 'pictureThumb', 'pictureMed']
+      attributes: ['hashedId', 'firstName', 'gender', 'birthday', 'bio', 'pictureThumb', 'pictureMed']
     }],
     order: [['createdAt', 'DESC']]
   }).then(function(letters) {
