@@ -138,7 +138,7 @@ exports.extendFacebookToken = function(req, res, next) {
   }, function(err, facebookRes) {
     if (!err && facebookRes) {
       req.fb_token = facebookRes.access_token;
-      req.fbTokenExpiry = Math.floor(Date.now()/1000) + parseInt(facebookRes.expires);
+      req.fbTokenExpiry = Math.floor(Date.now()/1000) + parseInt(facebookRes.expires_in);
       return next();
     } else {
       return res.status(400).send({
@@ -229,7 +229,7 @@ exports.extendFacebookTokenIfNecessary = function(req, res, next) {
     }, function(err, facebookRes) {
       if (!err && facebookRes) {
         req.fb_token = facebookRes.access_token;
-        req.fbTokenExpiry = Math.floor(Date.now()/1000) + parseInt(facebookRes.expires);
+        req.fbTokenExpiry = Math.floor(Date.now()/1000) + parseInt(facebookRes.expires_in);
         return next();
       } else {
         return res.status(400).send({
