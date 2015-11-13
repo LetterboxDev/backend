@@ -122,7 +122,7 @@ exports.getMediumProfilePicture = function(req, res, next) {
       req.pictureMed = fbResponse.location;
       return next();
     } else {
-      logger.error('Error when running validateFacebookToken, err: ' + JSON.stringify(err) + ' fb: ' + JSON.stringify(fbResponse));
+      logger.error('Error when running getMediumProfilePicture, err: ' + JSON.stringify(err) + ' fb: ' + JSON.stringify(fbResponse));
       return res.status(400).send({
         error: 'unable to retrieve medium profile picture'
       })
@@ -144,7 +144,7 @@ exports.extendFacebookToken = function(req, res, next) {
       req.fbTokenExpiry = Math.floor(Date.now()/1000) + parseInt(facebookRes.expires_in);
       return next();
     } else {
-      logger.error('Error when running validateFacebookToken, err: ' + JSON.stringify(err) + ' fb: ' + JSON.stringify(facebookRes));
+      logger.error('Error when running extendFacebookToken, err: ' + JSON.stringify(err) + ' fb: ' + JSON.stringify(facebookRes));
       return res.status(400).send({
         error: 'unable to extend token'
       });
@@ -236,7 +236,7 @@ exports.extendFacebookTokenIfNecessary = function(req, res, next) {
         req.fbTokenExpiry = Math.floor(Date.now()/1000) + parseInt(facebookRes.expires_in);
         return next();
       } else {
-        logger.error('Error when running validateFacebookToken, err: ' + JSON.stringify(err) + ' fb: ' + JSON.stringify(facebookRes));
+        logger.error('Error when running extendFacebookTokenIfNecessary, err: ' + JSON.stringify(err) + ' fb: ' + JSON.stringify(facebookRes));
         return res.status(400).send({
           error: 'unable to extend token'
         });
