@@ -92,6 +92,11 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.INTEGER,
       defaultValue: 2,
       allowNull: false
+    },
+    facebookTokenExpiry: {
+      type: DataTypes.BIGINT,
+      defaultValue: 0,
+      allowNull: false
     }
   }, {
     associate: function(models) {
