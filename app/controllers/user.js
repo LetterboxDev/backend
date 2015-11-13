@@ -135,11 +135,13 @@ exports.extendFacebookToken = function(req, res, next) {
   }, function(err, facebookRes) {
     if (!err && facebookRes) {
       req.fb_token = facebookRes.access_token;
+      req.fbTokenExpiry = Math.floor(Date.now()/1000) + parseInt(facebookRes.expires);
       return next();
+    } else {
+      return res.status(400).send({
+        error: 'unable to extend token'
+      });
     }
-    return res.status(400).send({
-      error: 'unable to extend token'
-    });
   });
 };
 
@@ -164,7 +166,8 @@ exports.storeUserData = function(req, res, next) {
         pictureMed: req.pictureMed,
         gender: req.gender,
         genderPreference: genderPreference,
-        accessToken: req.fb_token
+        accessToken: req.fb_token,
+        facebookTokenExpiry: req.fbTokenExpiry
       }).then(function(user) {
         var encryptedToken = token.generateToken(hashedId);
         return res.status(200).send({
@@ -185,7 +188,8 @@ exports.storeUserData = function(req, res, next) {
         firstName: req.firstName,
         lastName: req.lastName,
         birthday: req.birthday,
-        gender: req.gender
+        gender: req.gender,
+        facebookTokenExpiry: req.fbTokenExpiry
       }).then(function(user) {
         var encryptedToken = token.generateToken(hashedId);
         return res.status(200).send({
@@ -209,13 +213,39 @@ exports.setRenewVars = function(req, res, next) {
   return next();
 };
 
+exports.extendFacebookTokenIfNecessary = function(req, res, next) {
+  req.fbTokenExpiry = req.user.facebookTokenExpiry;
+  if (Math.floor(Date.now()/1000) > req.user.facebookTokenExpiry - 864000) {
+    graph.setAppSecret(process.env.FACEBOOK_APP_SECRET);
+    graph.setAccessToken(req.fb_token);
+    graph.extendAccessToken({
+      'access_token': req.fb_token,
+      'client_id': process.env.FACEBOOK_APP_ID,
+      'client_secret': process.env.FACEBOOK_APP_SECRET
+    }, function(err, facebookRes) {
+      if (!err && facebookRes) {
+        req.fb_token = facebookRes.access_token;
+        req.fbTokenExpiry = Math.floor(Date.now()/1000) + parseInt(facebookRes.expires);
+        return next();
+      } else {
+        return res.status(400).send({
+          error: 'unable to extend token'
+        });
+      }
+    });
+  } else {
+    next();
+  }
+};
+
 exports.renewToken = function(req, res) {
   req.user.update({
     firstName: req.firstName,
     lastName: req.lastName,
     birthday: req.birthday,
     gender: req.gender,
-    accessToken: req.fb_token
+    accessToken: req.fb_token,
+    facebookTokenExpiry: req.fbTokenExpiry
   }).then(function(user) {
     var encryptedToken = token.generateToken(req.user.hashedId);
     return res.status(200).send({
