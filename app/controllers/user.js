@@ -7,6 +7,7 @@ var token = require('../../config/token');
 var db = require('../../config/sequelize');
 var graph = require('fbgraph');
 var dealController = require('./deal');
+var logger = require('../../config/logger');
 
 var getDistanceMatchAttributes = function(myLat, myLon) {
   return [
@@ -104,6 +105,7 @@ exports.validateFacebookToken = function(req, res, next) {
       req.pictureThumb = fbResponse.picture.data.url
       return next();
     } else {
+      logger.error('Error when running validateFacebookToken, err: ' + JSON.stringify(err) + ' fb: ' + JSON.stringify(fbResponse));
       return res.status(400).send({
         error: 'invalid facebook access token'
       });
@@ -120,6 +122,7 @@ exports.getMediumProfilePicture = function(req, res, next) {
       req.pictureMed = fbResponse.location;
       return next();
     } else {
+      logger.error('Error when running validateFacebookToken, err: ' + JSON.stringify(err) + ' fb: ' + JSON.stringify(fbResponse));
       return res.status(400).send({
         error: 'unable to retrieve medium profile picture'
       })
@@ -141,6 +144,7 @@ exports.extendFacebookToken = function(req, res, next) {
       req.fbTokenExpiry = Math.floor(Date.now()/1000) + parseInt(facebookRes.expires_in);
       return next();
     } else {
+      logger.error('Error when running validateFacebookToken, err: ' + JSON.stringify(err) + ' fb: ' + JSON.stringify(facebookRes));
       return res.status(400).send({
         error: 'unable to extend token'
       });
@@ -232,6 +236,7 @@ exports.extendFacebookTokenIfNecessary = function(req, res, next) {
         req.fbTokenExpiry = Math.floor(Date.now()/1000) + parseInt(facebookRes.expires_in);
         return next();
       } else {
+        logger.error('Error when running validateFacebookToken, err: ' + JSON.stringify(err) + ' fb: ' + JSON.stringify(facebookRes));
         return res.status(400).send({
           error: 'unable to extend token'
         });
