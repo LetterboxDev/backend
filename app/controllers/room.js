@@ -77,10 +77,10 @@ exports.getSingleRoom = function(req, res) {
           recipient: req.user.hashedId,
           isRead: 0
         }
-      }).then(unreadCount) {
+      }).then(function(unreadCount) {
         room.unreadCount = unreadCount;
         return res.send(room);
-      }
+      });
     });
   });
 };
