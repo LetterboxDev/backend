@@ -74,6 +74,7 @@ exports.getSingleRoom = function(req, res) {
       db.Message.count({
         where: {
           RoomHash: req.room.hash,
+          recipient: req.user.hashedId,
           isRead: 0
         }
       }).then(unreadCount) {
