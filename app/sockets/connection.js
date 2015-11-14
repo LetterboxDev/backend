@@ -53,4 +53,31 @@ io.on('connection', function(socket) {
       });
     }
   });
+  socket.on('roomRead', function(data) {
+    if (data.roomHash) {
+      db.Room.findOne({
+        where: {
+          hash: data.roomHash,
+          $or: [
+            {user1: socket.decoded_token.hashedId},
+            {user2: socket.decoded_token.hashedId}
+          ]
+        }
+      }).then(function(room) {
+        if (room) {
+          db.Message.update({isRead: 1}, {
+            where: {
+              RoomHash: room.hash,
+              recipient: socket.decoded_token.hashedId,
+              timeSent: {
+                $lte: data.time
+              }
+            }
+          }).then(function(affectedCount, rows) {
+            io.to(socket.decoded_token.hashedId).emit('roomRead', data);
+          });
+        }
+      });
+    }
+  });
 });
