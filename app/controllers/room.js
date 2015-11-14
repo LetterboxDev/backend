@@ -71,8 +71,16 @@ exports.getSingleRoom = function(req, res) {
         room.latestMessage.content = latestMessage.content;
         room.latestMessage.timeSent = latestMessage.timeSent;
       }
-      return res.send(room);
-    })
+      db.Message.count({
+        where: {
+          RoomHash: req.room.hash,
+          isRead: 0
+        }
+      }).then(unreadCount) {
+        room.unreadCount = unreadCount;
+        return res.send(room);
+      }
+    });
   });
 };
 
