@@ -40,7 +40,8 @@ exports.getFeaturedDeals = function(req, res) {
     include: [{
       model: db.Deal,
       include: [db.DealImage, db.DealLike, db.DealProvider]
-    }]
+    }],
+    order: [['createdAt', 'DESC']]
   };
   if (req.query.limit) {
     query.limit = req.query.limit;
