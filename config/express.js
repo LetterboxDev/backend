@@ -21,5 +21,6 @@ app.use(bodyParser.json());
 app.use(methodOverride());
 app.use(require('./cors').allowCrossDomain);
 app.use(require('./tokenauth').authenticate);
+app.use(require('./caching').removeNotModified);
 
 module.exports = app;
