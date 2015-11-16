@@ -327,7 +327,7 @@ function getMaxBirthday(minAge) {
 }
 
 exports.clearRecordedMatches = function(req, res, next) {
-  if (!req.query.previousId) {
+  if ((typeof req.query.clearPrevious === 'undefined' && !req.query.previousId) || (typeof req.query.clearPrevious !== 'undefined' && req.query.clearPrevious)) {
     db.Match.destroy({
       where: {
         matcherHashedId: req.user.hashedId
