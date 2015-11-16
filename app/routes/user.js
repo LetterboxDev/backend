@@ -16,6 +16,7 @@ exports.init = function(app) {
   app.put('/user/bio', userController.requireAuthentication, userController.updateBio);
   app.put('/user/genderPreference', userController.requireAuthentication, userController.updateGenderPreference);
   app.put('/user/version', userController.requireAuthentication, userController.setVersion);
+  app.put('/user/deactivate', userController.requireAuthentication, userController.deactivate);
 
   app.get('/match', userController.requireAuthentication, userController.clearRecordedMatches, userController.getMatch, userController.recordMatch, userController.getMatchLikedDeals, userController.sendMatch);
   app.get('/matches', userController.requireAuthentication, userController.getMultipleMatches, userController.sendMultipleMatches);

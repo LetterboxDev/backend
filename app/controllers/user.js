@@ -843,6 +843,17 @@ exports.setVersion = function(req, res) {
   }
 };
 
+exports.deactivate = function(req, res) {
+  req.user.update({
+    isRegistered: false,
+    pushToken: null
+  }).then(function(user) {
+    return res.send({
+      status: 'success'
+    });
+  });
+};
+
 function isFloat(n) {
   return n === Number(n) && n % 1 !== 0;
 }
