@@ -4,6 +4,7 @@
 
 var db = require('../../config/sequelize');
 var dealController = require('./deal');
+var userController = require('./user');
 
 exports.getRooms = function(req, res) {
   db.Room.findAll({
@@ -33,8 +34,8 @@ exports.getRooms = function(req, res) {
           if (userAccounts[j].hashedId === otherUser) {
             room.userId = otherUser;
             room.userName = userAccounts[j].firstName;
-            room.thumbnail = userAccounts[j].pictureThumb;
-            room.profilePicture = userAccounts[j].pictureMed;
+            room.thumbnail = userController.generateThumbUrl(otherUser);
+            room.profilePicture = userController.generateMedUrl(otherUser);
             break;
           }
         }
@@ -62,8 +63,8 @@ exports.getSingleRoom = function(req, res) {
       room.letter = req.letter;
       room.userId = user.hashedId;
       room.userName = user.firstName;
-      room.thumbnail = user.pictureThumb;
-      room.profilePicture = user.pictureMed;
+      room.thumbnail = userController.generateThumbUrl(user.hashedId);
+      room.profilePicture = userController.generateMedUrl(user.hashedId);
       room.createdAt = req.room.createdAt;
       room.latestMessage = {};
       if (latestMessage) {
