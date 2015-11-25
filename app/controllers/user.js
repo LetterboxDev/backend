@@ -450,8 +450,8 @@ exports.sendMatch = function(req, res) {
           firstName: user.firstName,
           questions: questions,
           bio: user.bio,
-          pictureThumb: user.pictureThumb,
-          pictureMed: user.pictureMed,
+          pictureThumb: generateImageUrl('thumbimage')(user.hashedId),
+          pictureMed: generateImageUrl('medimage')(user.hashedId),
           distance: req.matchingUser.dataValues.distance,
           age: age,
           mutualFriends: fbResponse.context.mutual_friends,
@@ -465,8 +465,8 @@ exports.sendMatch = function(req, res) {
           firstName: user.firstName,
           questions: questions,
           bio: user.bio,
-          pictureThumb: user.pictureThumb,
-          pictureMed: user.pictureMed,
+          pictureThumb: generateImageUrl('thumbimage')(user.hashedId),
+          pictureMed: generateImageUrl('medimage')(user.hashedId),
           distance: req.matchingUser.dataValues.distance,
           age: age,
           mutualFriends: undefined,
@@ -550,8 +550,8 @@ exports.sendMultipleMatches = function(req, res) {
         firstName: user.firstName,
         questions: questions,
         bio: user.bio,
-        pictureThumb: user.pictureThumb,
-        pictureMed: user.pictureMed,
+        pictureThumb: generateImageUrl('thumbimage')(user.hashedId),
+        pictureMed: generateImageUrl('medimage')(user.hashedId),
         distance: getDistanceBetweenUsers(req.user, user),
         age: age,
         mutualFriends: []
@@ -631,8 +631,8 @@ exports.getSelf = function(req, res) {
     bio: req.user.bio,
     age: age,
     questions: questions,
-    pictureThumb: req.user.pictureThumb,
-    pictureMed: req.user.pictureMed,
+    pictureThumb: generateImageUrl('thumbimage')(req.user.hashedId),
+    pictureMed: generateImageUrl('medimage')(req.user.hashedId),
     perfectMatch: req.user.perfectMatch
   });
 };
@@ -655,8 +655,8 @@ exports.getOtherUser = function(req, res) {
         bio: req.otherUser.bio,
         age: age,
         questions: questions,
-        pictureThumb: req.otherUser.pictureThumb,
-        pictureMed: req.otherUser.pictureMed,
+        pictureThumb: generateImageUrl('thumbimage')(req.otherUser.hashedId),
+        pictureMed: generateImageUrl('medimage')(req.otherUser.hashedId),
         mutualFriends: fbResponse.context.mutual_friends,
         likedDeals: req.likedDeals
       });
@@ -668,8 +668,8 @@ exports.getOtherUser = function(req, res) {
         bio: req.otherUser.bio,
         age: age,
         questions: questions,
-        pictureThumb: req.otherUser.pictureThumb,
-        pictureMed: req.otherUser.pictureMed,
+        pictureThumb: generateImageUrl('thumbimage')(req.otherUser.hashedId),
+        pictureMed: generateImageUrl('medimage')(req.otherUser.hashedId),
         mutualFriends: undefined,
         likedDeals: req.likedDeals
       });
