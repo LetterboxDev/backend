@@ -8,6 +8,8 @@ var db = require('../../config/sequelize');
 var graph = require('fbgraph');
 var dealController = require('./deal');
 var logger = require('../../config/logger');
+var https = require('https');
+var URI = require('urijs');
 
 var getDistanceMatchAttributes = function(myLat, myLon) {
   return [
@@ -842,6 +844,54 @@ exports.setVersion = function(req, res) {
     }); 
   }
 };
+
+exports.getThumbnailUrl = function(req, res, next) {
+  req.imageUrl = req.otherUser.pictureThumb;
+  return next();
+};
+
+exports.getMediumUrl = function(req, res, next) {
+  req.imageUrl = req.otherUser.pictureMed;
+  return next();
+};
+
+exports.getImage = function(req, res) {
+  var uri = new URI(req.imageUrl);
+  var options = {
+    hostname: uri.hostname(),
+    path: uri.path() + uri.search(),
+    method: 'GET'
+  };
+  var hreq = https.request(options, function(response) {
+    var data = [];
+    response.on('data', function(d) {
+      data.push(d);
+    });
+    response.on('end', function() {
+      data = Buffer.concat(data);
+      res.writeHead(200, { 'Content-Type': 'image/jpg' });
+      res.end(data, 'binary');
+    });
+  });
+  hreq.end();
+  hreq.on('error', function(e) {
+    res.status(400).send({
+      error: 'error occurred when fetching image'
+    });
+  });
+};
+
+
+function generateImageUrl(type) {
+  return function(hashedId) {
+    var uri = new URI(process.env.HOSTNAME);
+    uri.path('/user/id/' + hashedId + '/' + type);
+    return uri.toString();
+  };
+}
+
+exports.generateThumbUrl = generateImageUrl('thumbimage');
+exports.generateMedUrl = generateImageUrl('medimage');
 
 exports.deactivate = function(req, res) {
   req.user.update({

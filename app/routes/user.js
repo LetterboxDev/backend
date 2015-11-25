@@ -18,6 +18,9 @@ exports.init = function(app) {
   app.put('/user/version', userController.requireAuthentication, userController.setVersion);
   app.put('/user/deactivate', userController.requireAuthentication, userController.deactivate);
 
+  app.get('/user/id/:hashedId/thumbimage', userController.getThumbnailUrl, userController.getImage);
+  app.get('/user/id/:hashedId/medimage', userController.getMediumUrl, userController.getImage);
+
   app.get('/match', userController.requireAuthentication, userController.clearRecordedMatches, userController.getMatch, userController.recordMatch, userController.getMatchLikedDeals, userController.sendMatch);
   app.get('/matches', userController.requireAuthentication, userController.getMultipleMatches, userController.sendMultipleMatches);
   
