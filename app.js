@@ -19,6 +19,16 @@ logger.info("Added socket: connection.js");
 var routesDir = __dirname + '/app/routes';
 var routeFiles = fs.readdirSync(routesDir);
 
+// Rate Limiter for entire application
+var redisClient = require('redis').createClient();
+var limiter = require('express-limiter')(app, redisClient);
+
+limiter({
+  path: '*',
+  method: 'all',
+  lookup: ['user.id', 'connection.remoteAddress']
+});
+
 routeFiles.forEach(function(file) {
   route = require(routesDir + '/' + file);
   route.init(app);
