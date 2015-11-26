@@ -24,9 +24,12 @@ var redisClient = require('redis').createClient();
 var limiter = require('express-limiter')(app, redisClient);
 
 limiter({
-  path: '*',
+  path: '/match',
   method: 'all',
-  lookup: ['user.id', 'connection.remoteAddress']
+  lookup: ['user.id', 'connection.remoteAddress'],
+  // Limit 50 requests per minute
+  total: 50,
+  expire: 60000
 });
 
 routeFiles.forEach(function(file) {
