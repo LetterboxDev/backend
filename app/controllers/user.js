@@ -869,7 +869,7 @@ exports.getImage = function(req, res) {
     });
     response.on('end', function() {
       data = Buffer.concat(data);
-      res.header("Cache-Control", "public, max-age=1200");
+      res.header("Cache-Control", "public, max-age=21600");
       res.removeHeader("Pragma");
       res.removeHeader("Expires");
       res.writeHead(200, { 'Content-Type': 'image/jpg' });
