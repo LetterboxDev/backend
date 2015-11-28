@@ -631,8 +631,8 @@ exports.getSelf = function(req, res) {
     bio: req.user.bio,
     age: age,
     questions: questions,
-    pictureThumb: generateImageUrl('thumbimage')(req.user.hashedId),
-    pictureMed: generateImageUrl('medimage')(req.user.hashedId),
+    pictureThumb: req.user.pictureThumb,
+    pictureMed: req.user.pictureMed,
     perfectMatch: req.user.perfectMatch
   });
 };
@@ -869,6 +869,9 @@ exports.getImage = function(req, res) {
     });
     response.on('end', function() {
       data = Buffer.concat(data);
+      res.header("Cache-Control", "public, max-age=600");
+      res.removeHeader("Pragma");
+      res.removeHeader("Expires");
       res.writeHead(200, { 'Content-Type': 'image/jpg' });
       res.end(data, 'binary');
     });
